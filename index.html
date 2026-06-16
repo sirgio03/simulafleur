@@ -70,6 +70,15 @@
         .cute-input:focus { border-color: var(--primary); box-shadow: 0 0 15px rgba(255, 225, 53, 0.2); transform: scale(1.02); }
         .cute-input::placeholder { color: #52525b; }
         
+        /* Optimisations pour Mobile */
+        @media (max-width: 768px) {
+            .cute-input { font-size: 16px !important; } /* Empêche le zoom auto sur iOS */
+            /* Cache les flèches haut/bas des inputs number sur mobile pour gagner de la place */
+            input[type="number"]::-webkit-inner-spin-button, 
+            input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+            input[type="number"] { -moz-appearance: textfield; }
+        }
+
         .grade-input { text-align: center; }
 
         .btn-banana {
@@ -426,17 +435,17 @@
                             </div>
                         </div>
 
-                        <div class="overflow-x-auto pb-2">
-                            <table class="w-full text-left border-collapse min-w-[550px] md:min-w-[700px]">
+                        <div class="overflow-x-auto pb-2 w-full">
+                            <table class="w-full text-left border-collapse min-w-full md:min-w-[700px]">
                                 <thead>
-                                    <tr class="text-zinc-400 text-[10px] md:text-sm border-b border-zinc-700 bg-zinc-800/30">
-                                        <th class="p-2 md:p-3 rounded-tl-xl">Module</th>
-                                        <th class="p-2 md:p-3 text-center w-10 md:w-16">Coef</th>
-                                        <th class="p-2 md:p-3 text-center w-14 md:w-20">Note CC</th>
-                                        <th class="p-2 md:p-3 text-center w-14 md:w-20">Exam Init.</th>
-                                        <th class="p-2 md:p-3 text-center w-28 md:w-36 text-yellow-400 bg-yellow-900/10">Rattrapage Libre 🎯</th>
-                                        <th class="p-2 md:p-3 text-center w-14 md:w-20">Moyenne</th>
-                                        <th class="p-2 md:p-3 text-center w-20 md:w-24 rounded-tr-xl">Statut</th>
+                                    <tr class="text-zinc-400 text-[9px] md:text-sm border-b border-zinc-700 bg-zinc-800/30">
+                                        <th class="p-1 md:p-3 rounded-tl-xl">Mod.</th>
+                                        <th class="p-1 md:p-3 text-center w-8 md:w-16">Coef</th>
+                                        <th class="p-1 md:p-3 text-center w-10 md:w-20">CC</th>
+                                        <th class="p-1 md:p-3 text-center w-10 md:w-20">Exam</th>
+                                        <th class="p-1 md:p-3 text-center w-14 md:w-36 text-yellow-400 bg-yellow-900/10 leading-tight">Rattrap.🎯</th>
+                                        <th class="p-1 md:p-3 text-center w-10 md:w-20">Moy.</th>
+                                        <th class="p-1 md:p-3 text-center w-20 md:w-24 rounded-tr-xl hidden md:table-cell">Statut</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -447,7 +456,7 @@
                     const isModAcquired = modAvg >= 10.0;
                     
                     // The core requirement: NEVER block the rattrapage input.
-                    let rattrapageHtml = `<input type="number" min="0" max="20" step="0.25" value="${mod.rattrapage !== null ? mod.rattrapage : ''}" placeholder="Ta note ?" class="cute-input grade-input mx-auto border-zinc-600 focus:border-yellow-400 w-16 md:w-20 text-xs md:text-sm p-1 md:p-2" onchange="updateGrade(${uIdx}, ${mIdx}, 'rattrapage', this)">`;
+                    let rattrapageHtml = `<input type="number" min="0" max="20" step="0.25" value="${mod.rattrapage !== null ? mod.rattrapage : ''}" placeholder="?" class="cute-input grade-input mx-auto border-zinc-600 focus:border-yellow-400 w-12 md:w-20 text-[16px] md:text-sm p-1 md:p-2" onchange="updateGrade(${uIdx}, ${mIdx}, 'rattrapage', this)">`;
                     let estimationHtml = "";
                     
                     let statusHtml = "";
@@ -470,31 +479,31 @@
                         }
 
                         if (targetExam <= 20) {
-                            estimationHtml = `<div class="text-[9px] md:text-[10px] text-yellow-300 font-bold mt-1.5 md:mt-2 text-center bg-yellow-900/40 rounded-md p-1 md:p-1.5 border border-yellow-700/50 shadow-sm" title="Obtiens cette note pour valider TOUTE l'année !">🌟 Vise <strong>${targetExam.toFixed(2)}</strong> pour sauver l'année !</div>`;
+                            estimationHtml = `<div class="text-[8px] md:text-[10px] text-yellow-300 font-bold mt-1 md:mt-2 text-center bg-yellow-900/40 rounded-md p-0.5 md:p-1.5 border border-yellow-700/50 shadow-sm leading-tight" title="Obtiens cette note pour valider TOUTE l'année !">🌟 Vise <br class="md:hidden"><strong>${targetExam.toFixed(2)}</strong></div>`;
                         } else {
-                            estimationHtml = `<div class="text-[9px] md:text-[10px] text-rose-400 font-bold mt-1.5 md:mt-2 text-center bg-rose-900/20 rounded-md p-1 md:p-1.5 border border-rose-800/50 opacity-80">Impossible seul (>20)</div>`;
+                            estimationHtml = `<div class="text-[8px] md:text-[10px] text-rose-400 font-bold mt-1 md:mt-2 text-center bg-rose-900/20 rounded-md p-0.5 md:p-1.5 border border-rose-800/50 opacity-80 leading-tight">Impos. <br class="md:hidden">(>20)</div>`;
                         }
                     }
 
                     unitHtml += `
                         <tr class="border-b border-zinc-800/50 hover:bg-zinc-800/80 transition-colors">
-                            <td class="p-1 md:p-2">
-                                <div class="flex items-center gap-1 md:gap-2">
-                                    <button onclick="deleteModule(${uIdx}, ${mIdx})" class="text-zinc-600 hover:text-red-400 text-sm md:text-lg p-1" title="Supprimer module">✖</button>
-                                    <input type="text" value="${mod.name}" class="font-bold text-zinc-100 bg-transparent outline-none w-full border-b border-transparent focus:border-yellow-400 text-xs md:text-base" onchange="updateModField(${uIdx}, ${mIdx}, 'name', this.value)">
+                            <td class="p-0.5 md:p-2">
+                                <div class="flex items-center gap-0.5 md:gap-2">
+                                    <button onclick="deleteModule(${uIdx}, ${mIdx})" class="text-zinc-600 hover:text-red-400 text-xs md:text-lg p-1.5 md:p-1" title="Supprimer module">✖</button>
+                                    <input type="text" value="${mod.name}" class="font-bold text-zinc-100 bg-transparent outline-none w-full min-w-[70px] border-b border-transparent focus:border-yellow-400 text-[10px] md:text-base leading-tight" onchange="updateModField(${uIdx}, ${mIdx}, 'name', this.value)">
                                 </div>
                             </td>
-                            <td class="p-1 md:p-2 text-center"><input type="number" min="1" value="${mod.coef}" class="cute-input grade-input mx-auto text-xs md:text-sm p-1 md:p-1.5 w-10 md:w-14" onchange="updateModField(${uIdx}, ${mIdx}, 'coef', this.value)"></td>
-                            <td class="p-1 md:p-2 text-center"><input type="number" min="0" max="20" step="0.25" value="${mod.cc !== null ? mod.cc : ''}" placeholder="-" class="cute-input grade-input mx-auto text-xs md:text-sm p-1 md:p-1.5 w-12 md:w-16" onchange="updateModField(${uIdx}, ${mIdx}, 'cc', this.value)"></td>
-                            <td class="p-1 md:p-2 text-center"><input type="number" min="0" max="20" step="0.25" value="${mod.exam !== null ? mod.exam : ''}" placeholder="-" class="cute-input grade-input mx-auto text-xs md:text-sm p-1 md:p-1.5 w-12 md:w-16 ${mod.rattrapage !== null && mod.rattrapage !== '' ? 'opacity-40 line-through' : ''}" onchange="updateModField(${uIdx}, ${mIdx}, 'exam', this.value)"></td>
-                            <td class="p-1 md:p-2 text-center align-top bg-yellow-900/10">
+                            <td class="p-0.5 md:p-2 text-center"><input type="number" min="1" value="${mod.coef}" class="cute-input grade-input mx-auto text-[16px] md:text-sm p-0.5 md:p-1.5 w-8 md:w-14" onchange="updateModField(${uIdx}, ${mIdx}, 'coef', this.value)"></td>
+                            <td class="p-0.5 md:p-2 text-center"><input type="number" min="0" max="20" step="0.25" value="${mod.cc !== null ? mod.cc : ''}" placeholder="-" class="cute-input grade-input mx-auto text-[16px] md:text-sm p-0.5 md:p-1.5 w-10 md:w-16" onchange="updateModField(${uIdx}, ${mIdx}, 'cc', this.value)"></td>
+                            <td class="p-0.5 md:p-2 text-center"><input type="number" min="0" max="20" step="0.25" value="${mod.exam !== null ? mod.exam : ''}" placeholder="-" class="cute-input grade-input mx-auto text-[16px] md:text-sm p-0.5 md:p-1.5 w-10 md:w-16 ${mod.rattrapage !== null && mod.rattrapage !== '' ? 'opacity-40 line-through' : ''}" onchange="updateModField(${uIdx}, ${mIdx}, 'exam', this.value)"></td>
+                            <td class="p-0.5 md:p-2 text-center align-top bg-yellow-900/10">
                                 <div class="flex flex-col justify-center h-full">
                                     ${rattrapageHtml}
                                     ${estimationHtml}
                                 </div>
                             </td>
-                            <td class="p-1 md:p-2 text-center font-black text-sm md:text-lg ${isModAcquired ? 'text-emerald-400' : 'text-yellow-500'}">${modAvg.toFixed(2)}</td>
-                            <td class="p-1 md:p-2 text-center">${statusHtml}</td>
+                            <td class="p-0.5 md:p-2 text-center font-black text-[11px] md:text-lg ${isModAcquired ? 'text-emerald-400' : 'text-yellow-500'}">${modAvg.toFixed(2)}</td>
+                            <td class="p-1 md:p-2 text-center hidden md:table-cell">${statusHtml}</td>
                         </tr>
                     `;
                 });
