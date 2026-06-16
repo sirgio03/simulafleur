@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Simulateur M1 Sunflower 🌻</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #fefce8; /* Yellow 50 */
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --primary: #f59e0b; /* Amber 500 */
+            --primary-dark: #b45309; /* Amber 700 */
+            --secondary: #fbbf24; /* Amber 400 */
+            --text-main: #451a03; /* Orange 950 */
+            --success: #10b981; /* Emerald 500 */
+            --danger: #ef4444; /* Red 500 */
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #fef08a 0%, #fde047 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-attachment: fixed;
+        }
+
+        #particles {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            pointer-events: none; z-index: 0;
+        }
+        .particle {
+            position: absolute; font-size: 1.5rem; opacity: 0.8;
+            animation: floatUp linear forwards;
+            filter: drop-shadow(0 2px 4px rgba(245,158,11,0.3));
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(0.5) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-120px) scale(1.5) rotate(360deg); opacity: 0; }
+        }
+
+        .glass-panel {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 15px 35px rgba(245, 158, 11, 0.15);
+            position: relative;
+            z-index: 10;
+            padding: 24px;
+        }
+
+        .cute-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid #fde68a;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: var(--primary-dark);
+            background: #fffbeb;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        .cute-input:focus { border-color: var(--primary); box-shadow: 0 0 15px rgba(245, 158, 11, 0.3); transform: scale(1.02); background: white; }
+        
+        .grade-input { width: 70px; text-align: center; }
+        .grade-input:disabled { background: #f3f4f6; color: #9ca3af; border-color: #e5e7eb; transform: none; cursor: not-allowed; }
+
+        .btn-sunflower {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white; border: none; padding: 12px 24px; border-radius: 16px;
+            font-weight: 900; font-size: 1.1rem; cursor: pointer;
+            box-shadow: 0 8px 20px rgba(245, 158, 11, 0.4);
+            transition: all 0.2s;
+        }
+        .btn-sunflower:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(245, 158, 11, 0.5); }
+        .btn-sunflower:active { transform: translateY(1px); }
+
+        .btn-outline {
+            background: white; border: 2px solid var(--primary); color: var(--primary-dark);
+            padding: 8px 16px; border-radius: 12px; font-weight: 800; cursor: pointer; transition: all 0.2s;
+        }
+        .btn-outline:hover { background: var(--primary); color: white; }
+
+        .mascot-container { animation: floatMascot 3.5s ease-in-out infinite; filter: drop-shadow(0 10px 10px rgba(245,158,11,0.2)); }
+        @keyframes floatMascot {
+            0%, 100% { transform: translateY(0px) rotate(-2deg); }
+            50% { transform: translateY(-12px) rotate(2deg); }
+        }
+
+        .badge-acquis { background: #d1fae5; color: #047857; border: 1px solid #34d399; }
+        .badge-rattrapage { background: #fee2e2; color: #b91c1c; border: 1px solid #fb7185; }
+
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(69, 26, 3, 0.4); backdrop-filter: blur(5px);
+            z-index: 1000; display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: opacity 0.3s;
+        }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .modal-content {
+            background: white; padding: 24px; border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2); transform: translateY(20px);
+            transition: transform 0.3s; text-align: center; max-width: 90%; width: 360px;
+            border: 4px solid var(--secondary);
+        }
+        .modal-overlay.active .modal-content { transform: translateY(0); }
+
+    </style>
+</head>
+<body>
+
+    <div id="particles"></div>
+
+    <div id="confirmModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="text-4xl mb-3">🌻</div>
+            <h3 class="text-xl font-black text-amber-900 mb-6" id="confirmText">Es-tu sûr ?</h3>
+            <div class="flex gap-4 justify-center">
+                <button onclick="closeModal()" class="btn-outline !border-gray-300 !text-gray-500 hover:!bg-gray-100">Annuler</button>
+                <button id="confirmBtn" class="btn-sunflower !from-red-400 !to-red-600 !shadow-red-500/40">Oui, supprimer</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="onboarding" class="max-w-md mx-auto mt-20 relative z-10">
+        <div class="glass-panel text-center">
+            <div class="mascot-container w-32 h-32 mx-auto mb-4">
+                <!-- Mascotte Fille Tournesol Mignonne -->
+                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Pétales -->
+                    <path d="M 50 10 C 60 -5 80 15 65 30 C 85 20 105 40 85 55 C 105 70 80 95 65 80 C 60 100 40 100 35 80 C 20 95 -5 70 15 55 C -5 40 15 20 35 30 C 20 15 40 -5 50 10 Z" fill="#fde047"/>
+                    <path d="M 50 15 C 55 5 70 20 60 30 C 75 25 90 40 75 50 C 90 65 70 85 60 75 C 55 90 45 90 40 75 C 30 85 10 65 25 50 C 10 40 25 25 40 30 C 30 20 45 5 50 15 Z" fill="#fbbf24"/>
+                    <!-- Visage -->
+                    <circle cx="50" cy="50" r="28" fill="#fffbeb"/>
+                    <!-- Cheveux / Frange -->
+                    <path d="M 25 40 Q 50 20 75 40 Q 60 25 50 25 Q 40 25 25 40 Z" fill="#b45309"/>
+                    <!-- Yeux -->
+                    <ellipse cx="40" cy="50" rx="4" ry="6" fill="#451a03"/>
+                    <ellipse cx="60" cy="50" rx="4" ry="6" fill="#451a03"/>
+                    <circle cx="41" cy="48" r="1.5" fill="white"/>
+                    <circle cx="61" cy="48" r="1.5" fill="white"/>
+                    <!-- Joues -->
+                    <ellipse cx="32" cy="56" rx="5" ry="3" fill="#fca5a5" opacity="0.8"/>
+                    <ellipse cx="68" cy="56" rx="5" ry="3" fill="#fca5a5" opacity="0.8"/>
+                    <!-- Sourire -->
+                    <path d="M 45 58 Q 50 63 55 58" fill="none" stroke="#451a03" stroke-width="2.5" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <h1 class="text-2xl font-black text-amber-800 mb-2">Bienvenue en M1 ! 🌻</h1>
+            <p class="text-amber-700 font-semibold mb-6">Prêt(e) à valider l'année ? Comment t'appelles-tu ?</p>
+            
+            <input type="text" id="studentNameInput" class="cute-input mb-6 text-center text-lg py-3" placeholder="Ton prénom ici...">
+            <button onclick="startSession()" class="btn-sunflower w-full">Bismillah, on commence ! ✨</button>
+        </div>
+    </div>
+
+    <div id="dashboard" class="hidden max-w-6xl mx-auto mt-8 mb-12 space-y-8 relative z-10 p-4">
+        
+        <!-- Header Dashboard -->
+        <div class="glass-panel flex flex-col md:flex-row items-center justify-between gap-6">
+            <div>
+                <h1 class="text-3xl font-black text-amber-800 mb-2 flex items-center gap-3" id="dash-greeting">Salut !</h1>
+                <p class="text-amber-600 font-bold" id="dash-duaa">Rabi ywaf9ek dans tes études ! 🤲✨</p>
+                <div class="mt-3 bg-amber-50 p-3 rounded-xl border border-amber-200 inline-block">
+                    <p class="text-xs text-amber-700 font-bold uppercase mb-1">Objectif Actuel :</p>
+                    <p class="text-sm font-black text-amber-900" id="dash-objective">Calcul en cours...</p>
+                </div>
+            </div>
+            <div class="flex gap-4">
+                <div class="text-center bg-white/60 p-4 rounded-2xl border-2 border-amber-100 shadow-sm">
+                    <p class="text-xs font-black text-amber-500 uppercase">Moyenne S1</p>
+                    <p class="text-3xl font-black text-amber-700" id="dash-s1-avg">0.00</p>
+                </div>
+                <div class="text-center bg-white/60 p-4 rounded-2xl border-2 border-amber-100 shadow-sm">
+                    <p class="text-xs font-black text-amber-500 uppercase">Moyenne S2</p>
+                    <p class="text-3xl font-black text-amber-700" id="dash-s2-avg">0.00</p>
+                </div>
+                <div class="text-center bg-gradient-to-br from-amber-400 to-amber-500 p-4 rounded-2xl border-2 border-amber-300 shadow-lg transform hover:scale-105 transition-transform">
+                    <p class="text-xs font-black text-white uppercase text-shadow">Moyenne Annuelle</p>
+                    <p class="text-4xl font-black text-white" id="dash-annual-avg">0.00</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Conteneur des Semestres/Unités -->
+        <div id="units-container" class="space-y-8">
+            <!-- Injecté via JS -->
+        </div>
+
+        <!-- Boutons d'action -->
+        <div class="flex justify-center gap-4">
+            <button onclick="addUnit()" class="btn-outline border-dashed bg-white/50">+ Ajouter un nouveau Semestre/Bloc</button>
+        </div>
+
+        <!-- Footer Insta & Douaa -->
+        <div class="mt-16 mb-8 text-center glass-panel !bg-white/40 border-none shadow-none">
+            <div id="arabic-duaa-container" class="text-amber-900 text-xl md:text-2xl font-black mb-6 transition-opacity duration-700 opacity-0 min-h-[40px]" dir="rtl" style="font-family: 'Arial', sans-serif; line-height: 1.5;">
+                <!-- Généré par JS -->
+            </div>
+            <div class="inline-flex items-center gap-2 bg-amber-100/60 px-5 py-2.5 rounded-full border border-amber-200 shadow-sm">
+                <span class="text-amber-700 font-bold text-sm">Créé avec 💛 par</span>
+                <a href="https://instagram.com/sirgio03" target="_blank" class="text-amber-600 hover:text-amber-900 font-black flex items-center gap-1.5 transition-all hover:scale-105">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z" clip-rule="evenodd" /></svg>
+                    @sirgio03
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+    <script type="module">
+        let state = {
+            name: "",
+            units: [
+                {
+                    id: "s1", name: "🎒 Semestre 1",
+                    modules: [
+                        { id: "s1_m1", name: "Modélisation et Simulation", coef: 2, cc: 16.25, exam: 3.75, rattrapage: null },
+                        { id: "s1_m2", name: "Algo. et Systèmes Répartis", coef: 2, cc: 11.00, exam: 8.50, rattrapage: null },
+                        { id: "s1_m3", name: "Recherche Opérationnelle", coef: 2, cc: 9.25, exam: 6.00, rattrapage: null },
+                        { id: "s1_m4", name: "Analyse de Données", coef: 2, cc: 0.50, exam: 10.50, rattrapage: null },
+                        { id: "s1_m5", name: "Bases de Données", coef: 3, cc: 9.875, exam: 1.50, rattrapage: null },
+                        { id: "s1_m6", name: "Apprentissage Automatique", coef: 1, cc: null, exam: 8.00, rattrapage: null },
+                        { id: "s1_m7", name: "Traitement Numérique du Signal", coef: 1, cc: null, exam: 8.50, rattrapage: null },
+                        { id: "s1_m8", name: "Fondements Logiques", coef: 1, cc: null, exam: 5.25, rattrapage: null },
+                        { id: "s1_m9", name: "Sémantique Formelle", coef: 2, cc: 2.25, exam: 5.00, rattrapage: null },
+                        { id: "s1_m10", name: "Ethique et Déontologie", coef: 1, cc: null, exam: 16.00, rattrapage: null }
+                    ]
+                },
+                {
+                    id: "s2", name: "🌻 Semestre 2",
+                    modules: [
+                        { id: "s2_m1", name: "Traitement de la Parole", coef: 2, cc: 17.00, exam: 7.00, rattrapage: null },
+                        { id: "s2_m2", name: "Traitement Auto. du Langage", coef: 2, cc: 14.00, exam: 12.00, rattrapage: null },
+                        { id: "s2_m3", name: "Théorie de l'Information", coef: 1, cc: null, exam: 15.00, rattrapage: null },
+                        { id: "s2_m4", name: "Géométrie Algorithmique", coef: 2, cc: 13.00, exam: 11.50, rattrapage: null },
+                        { id: "s2_m5", name: "Vision Artificielle", coef: 2, cc: 14.50, exam: 7.00, rattrapage: null },
+                        { id: "s2_m6", name: "Traitement d'Images", coef: 2, cc: 14.50, exam: 10.50, rattrapage: null },
+                        { id: "s2_m7", name: "Modélisation 3D", coef: 3, cc: 13.54, exam: 8.50, rattrapage: null },
+                        { id: "s2_m8", name: "Agents et Systèmes Multi", coef: 2, cc: 13.00, exam: 10.00, rattrapage: null },
+                        { id: "s2_m9", name: "Reconnaissance des Formes", coef: 1, cc: null, exam: 7.50, rattrapage: null }
+                    ]
+                }
+            ]
+        };
+
+        let modalCallback = null;
+        window.showConfirm = (text, callback) => {
+            document.getElementById('confirmText').innerText = text;
+            modalCallback = callback;
+            document.getElementById('confirmModal').classList.add('active');
+            
+            document.getElementById('confirmBtn').onclick = () => {
+                closeModal();
+                if(modalCallback) modalCallback();
+            };
+        };
+        window.closeModal = () => {
+            document.getElementById('confirmModal').classList.remove('active');
+            modalCallback = null;
+        };
+
+        window.startSession = () => {
+            const nameInput = document.getElementById('studentNameInput').value.trim();
+            if(!nameInput) return;
+            state.name = nameInput;
+            
+            document.getElementById('onboarding').classList.add('hidden');
+            document.getElementById('dashboard').classList.remove('hidden');
+            
+            document.getElementById('dash-greeting').innerHTML = `Marhaba, <span class="text-amber-500">${state.name}</span> ! 🌻`;
+            document.getElementById('dash-duaa').innerText = `Qu'Allah te facilite et t'accorde la réussite, ${state.name} ! N'oublie pas tes prières 🤲✨`;
+            
+            renderUnits();
+        }
+
+        function getModAvg(mod) {
+            // Le rattrapage remplace l'examen initial
+            let finalExam = mod.rattrapage !== null && mod.rattrapage !== "" ? parseFloat(mod.rattrapage) : parseFloat(mod.exam || 0);
+            if (mod.cc !== null && mod.cc !== "") {
+                return (parseFloat(mod.cc) + finalExam) / 2;
+            }
+            return finalExam;
+        }
+
+        function getUnitStats(unit) {
+            let pts = 0, coefs = 0;
+            unit.modules.forEach(mod => {
+                let c = parseFloat(mod.coef || 0);
+                pts += getModAvg(mod) * c;
+                coefs += c;
+            });
+            let avg = coefs > 0 ? (pts / coefs) : 0;
+            return { avg, pts, coefs, isAcquired: avg >= 10.0 };
+        }
+
+        window.renderUnits = () => {
+            const container = document.getElementById('units-container');
+            container.innerHTML = '';
+            
+            // 1. Calcul Global de l'Année
+            let globalPts = 0, globalCoefs = 0;
+            let unitStatsList = [];
+
+            state.units.forEach(unit => {
+                const uStats = getUnitStats(unit);
+                unitStatsList.push(uStats);
+                globalPts += uStats.pts;
+                globalCoefs += uStats.coefs;
+            });
+
+            const globalAvg = globalCoefs > 0 ? (globalPts / globalCoefs) : 0;
+            const isYearAcquired = globalAvg >= 10.0;
+            
+            // Objectif : Atteindre 10.0 de moyenne générale (GlobalPts doit atteindre 10 * GlobalCoefs)
+            const targetGlobalPts = 10.0 * globalCoefs;
+            const globalDeficit = targetGlobalPts - globalPts;
+
+            // Mise à jour des en-têtes
+            document.getElementById('dash-annual-avg').innerText = globalAvg.toFixed(3);
+            if (unitStatsList.length >= 2) {
+                document.getElementById('dash-s1-avg').innerText = unitStatsList[0].avg.toFixed(2);
+                document.getElementById('dash-s2-avg').innerText = unitStatsList[1].avg.toFixed(2);
+            }
+
+            const objText = document.getElementById('dash-objective');
+            if (isYearAcquired) {
+                objText.innerHTML = "🎉 <span class='text-emerald-600'>Année Validée par compensation ! Félicitations !</span>";
+            } else {
+                objText.innerHTML = `⚠️ Il te manque <strong class='text-red-500'>${globalDeficit.toFixed(2)} points de pondération</strong> au total pour passer l'année.`;
+            }
+
+            // 2. Rendu de chaque Unité/Semestre
+            state.units.forEach((unit, uIdx) => {
+                const uStats = unitStatsList[uIdx];
+                const isUnitAcquired = uStats.isAcquired || isYearAcquired; // LMD Rule : Si l'année est validée, le semestre est validé.
+
+                let unitHtml = `
+                    <div class="glass-panel">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 border-b-2 border-amber-100 pb-4">
+                            <div class="flex items-center gap-4">
+                                <input type="text" value="${unit.name}" class="text-2xl font-black text-amber-900 bg-transparent outline-none border-b-2 border-transparent focus:border-amber-300 w-64" onchange="updateUnitName(${uIdx}, this.value)">
+                                <button onclick="deleteUnit(${uIdx})" class="text-red-400 hover:text-red-600 font-bold bg-red-50 px-2 py-1 rounded-md text-sm transition-colors">Supprimer Bloc</button>
+                            </div>
+                            <div class="flex items-center gap-4 mt-2 md:mt-0">
+                                <span class="text-2xl font-black ${uStats.isAcquired ? 'text-emerald-500' : 'text-rose-500'} bg-white px-4 py-1 rounded-xl shadow-sm border border-amber-100">${uStats.avg.toFixed(2)}</span>
+                                ${isUnitAcquired ? '<span class="px-3 py-1 rounded-full badge-acquis text-sm font-bold shadow-sm">✓ ACQUIS</span>' : '<span class="px-3 py-1 rounded-full badge-rattrapage text-sm font-bold shadow-sm">⚠ À COMPENSER</span>'}
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse min-w-[700px]">
+                                <thead>
+                                    <tr class="text-amber-700 text-sm border-b-2 border-amber-100 bg-amber-50/50">
+                                        <th class="p-3 rounded-tl-xl">Module</th>
+                                        <th class="p-3 text-center w-16">Coef</th>
+                                        <th class="p-3 text-center w-20">Note CC</th>
+                                        <th class="p-3 text-center w-20">Exam Init.</th>
+                                        <th class="p-3 text-center w-36 text-amber-600 bg-amber-100/50">Nouveau Rattrapage 🎯</th>
+                                        <th class="p-3 text-center w-20">Moyenne</th>
+                                        <th class="p-3 text-center w-24 rounded-tr-xl">Statut</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                `;
+
+                unit.modules.forEach((mod, mIdx) => {
+                    const modAvg = getModAvg(mod);
+                    const isModAcquired = modAvg >= 10.0;
+                    
+                    // --- LOGIQUE DE RATTRAPAGE & ESTIMATION MIRACLE ---
+                    let rattrapageHtml = "";
+                    let estimationHtml = "";
+                    let statusHtml = "";
+
+                    if (isYearAcquired) {
+                        rattrapageHtml = `<input type="text" disabled value="Année Validée 🔒" class="cute-input grade-input mx-auto text-xs bg-emerald-50 text-emerald-700 border-emerald-200">`;
+                        statusHtml = `<span class="text-emerald-500 font-bold text-sm">✓ Validé</span>`;
+                    } else if (uStats.isAcquired) {
+                        rattrapageHtml = `<input type="text" disabled value="Semestre Acquis 🔒" class="cute-input grade-input mx-auto text-xs bg-emerald-50 text-emerald-700 border-emerald-200">`;
+                        statusHtml = `<span class="text-emerald-500 font-bold text-sm">✓ Validé</span>`;
+                    } else if (isModAcquired) {
+                        rattrapageHtml = `<input type="text" disabled value="Module Acquis 🔒" class="cute-input grade-input mx-auto text-xs bg-emerald-50 text-emerald-700 border-emerald-200">`;
+                        statusHtml = `<span class="text-emerald-500 font-bold text-sm">✓ Validé</span>`;
+                    } else {
+                        // Rattrapage est Ouvert !
+                        rattrapageHtml = `<input type="number" min="0" max="20" step="0.25" value="${mod.rattrapage !== null ? mod.rattrapage : ''}" placeholder="Ta note ?" class="cute-input grade-input mx-auto border-amber-400 focus:border-amber-600" onchange="updateGrade(${uIdx}, ${mIdx}, 'rattrapage', this)">`;
+                        statusHtml = `<span class="text-rose-500 font-bold text-sm">À repasser</span>`;
+                        
+                        // Calcul d'estimation : "Quelle note exacte à l'examen pour sauver l'année entière avec CE SEUL module ?"
+                        if (globalDeficit > 0 && parseFloat(mod.coef) > 0) {
+                            // Combien de moyenne en plus il faut sur ce module pour combler le déficit global
+                            const avgIncreaseNeeded = globalDeficit / parseFloat(mod.coef);
+                            const currentModAvg = getModAvg({...mod, rattrapage: null}); // Base average without current active rattrapage just for calculation, or with it? Let's use current.
+                            const targetModAvg = modAvg + avgIncreaseNeeded; 
+                            
+                            // Retrouver la note d'examen cible: Avg = (CC + Exam)/2 => Exam = 2*Avg - CC
+                            let targetExam = 0;
+                            if (mod.cc !== null && mod.cc !== "") {
+                                targetExam = (targetModAvg * 2) - parseFloat(mod.cc);
+                            } else {
+                                targetExam = targetModAvg;
+                            }
+
+                            if (targetExam <= 20) {
+                                estimationHtml = `<div class="text-[10px] text-amber-700 font-bold mt-2 text-center bg-amber-100 rounded-md p-1.5 border border-amber-200 shadow-sm" title="Obtiens cette note à l'examen pour valider TOUTE l'année d'un seul coup !">🌟 Vise <strong>${targetExam.toFixed(2)}</strong> pour sauver l'année !</div>`;
+                            } else {
+                                estimationHtml = `<div class="text-[10px] text-rose-500 font-bold mt-2 text-center bg-rose-50 rounded-md p-1.5 border border-rose-100 opacity-80">Impossible seul (>20)</div>`;
+                            }
+                        }
+                    }
+
+                    unitHtml += `
+                        <tr class="border-b border-amber-50 hover:bg-white/60 transition-colors">
+                            <td class="p-2">
+                                <div class="flex items-center gap-2">
+                                    <button onclick="deleteModule(${uIdx}, ${mIdx})" class="text-rose-300 hover:text-rose-500 text-lg" title="Supprimer module">✖</button>
+                                    <input type="text" value="${mod.name}" class="font-bold text-amber-900 bg-transparent outline-none w-full border-b border-transparent focus:border-amber-200" onchange="updateModField(${uIdx}, ${mIdx}, 'name', this.value)">
+                                </div>
+                            </td>
+                            <td class="p-2 text-center"><input type="number" min="1" value="${mod.coef}" class="cute-input grade-input mx-auto text-sm p-1.5" onchange="updateModField(${uIdx}, ${mIdx}, 'coef', this.value)"></td>
+                            <td class="p-2 text-center"><input type="number" min="0" max="20" step="0.25" value="${mod.cc !== null ? mod.cc : ''}" placeholder="-" class="cute-input grade-input mx-auto text-sm p-1.5" onchange="updateModField(${uIdx}, ${mIdx}, 'cc', this.value)"></td>
+                            <td class="p-2 text-center"><input type="number" min="0" max="20" step="0.25" value="${mod.exam !== null ? mod.exam : ''}" class="cute-input grade-input mx-auto text-sm p-1.5 ${mod.rattrapage !== null && mod.rattrapage !== '' ? 'opacity-40 line-through' : ''}" onchange="updateModField(${uIdx}, ${mIdx}, 'exam', this.value)"></td>
+                            <td class="p-2 text-center align-top bg-amber-50/30">
+                                <div class="flex flex-col justify-center h-full">
+                                    ${rattrapageHtml}
+                                    ${estimationHtml}
+                                </div>
+                            </td>
+                            <td class="p-2 text-center font-black text-lg ${isModAcquired ? 'text-emerald-500' : 'text-amber-500'}">${modAvg.toFixed(2)}</td>
+                            <td class="p-2 text-center">${statusHtml}</td>
+                        </tr>
+                    `;
+                });
+
+                unitHtml += `
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="mt-4 flex justify-end">
+                            <button onclick="addModule(${uIdx})" class="text-sm font-bold text-amber-600 hover:text-white hover:bg-amber-500 bg-amber-100 px-4 py-2 rounded-xl transition-colors">+ Ajouter un module ici</button>
+                        </div>
+                    </div>
+                `;
+                
+                container.innerHTML += unitHtml;
+            });
+        };
+
+        window.updateGrade = (uIdx, mIdx, field, inputEl) => {
+            let val = inputEl.value;
+            let numVal = val === "" ? null : parseFloat(val);
+            
+            let oldVal = state.units[uIdx].modules[mIdx][field];
+            state.units[uIdx].modules[mIdx][field] = numVal;
+
+            // Spawn particles if grade improved!
+            if (numVal !== null && (oldVal === null || numVal > oldVal)) {
+                spawnReaction(inputEl);
+            }
+
+            renderUnits();
+        }
+
+        window.updateModField = (uIdx, mIdx, field, val) => {
+            let parsedVal = val === "" ? null : (field === 'coef' ? parseFloat(val) || 1 : (field === 'name' ? val : parseFloat(val)));
+            state.units[uIdx].modules[mIdx][field] = parsedVal;
+            renderUnits();
+        }
+
+        window.updateUnitName = (uIdx, val) => {
+            state.units[uIdx].name = val;
+            renderUnits();
+        }
+
+        window.addUnit = () => {
+            state.units.push({
+                id: "u" + Date.now(), name: "Nouveau Semestre",
+                modules: [{ id: "m" + Date.now(), name: "Nouveau Module", coef: 1, cc: null, exam: null, rattrapage: null }]
+            });
+            renderUnits();
+        }
+
+        window.addModule = (uIdx) => {
+            state.units[uIdx].modules.push({ id: "m" + Date.now(), name: "Module", coef: 1, cc: null, exam: null, rattrapage: null });
+            renderUnits();
+        }
+
+        window.deleteUnit = (uIdx) => {
+            showConfirm("Supprimer tout ce semestre ?", () => {
+                state.units.splice(uIdx, 1);
+                renderUnits();
+            });
+        }
+
+        window.deleteModule = (uIdx, mIdx) => {
+            showConfirm("Supprimer ce module ?", () => {
+                state.units[uIdx].modules.splice(mIdx, 1);
+                if(state.units[uIdx].modules.length === 0) state.units.splice(uIdx, 1); // Delete UE if empty
+                renderUnits();
+            });
+        }
+
+        const emojis = ['🌻', '✨', '💛', '⭐', '🔥'];
+        function spawnReaction(element) {
+            const rect = element.getBoundingClientRect();
+            for(let i=0; i<4; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+                particle.style.left = (rect.left + (Math.random() * rect.width) - 10) + 'px';
+                particle.style.top = (rect.top - 20) + 'px';
+                particle.style.animationDuration = (Math.random() * 0.8 + 1) + 's';
+                document.body.appendChild(particle);
+                setTimeout(() => particle.remove(), 2000);
+            }
+        }
+
+        // --- GESTION DES DOUÂAS ARABES ---
+        const arabicDuaas = [
+            "اللهم لا سهل إلا ما جعلته سهلاً، وأنت تجعل الحزن إذا شئت سهلاً 🤲",
+            "رب اشرح لي صدري ويسر لي أمري 🌻",
+            "اللهم افتح عليّ فتوح العارفين بحكمتك ✨",
+            "ربي يسر ولا تعسر، ربي أتمم بالخير 💛",
+            "اللهم إني أستودعك ما قرأت وما حفظت فرده عند حاجتي إليه 📚",
+            "اللهم ارزقني قوة الحفظ وسرعة الفهم وصفاء الذهن 🌟",
+            "توكلت على الله ولا حول ولا قوة إلا بالله 🤍"
+        ];
+
+        function rotateDuaa() {
+            const duaaEl = document.getElementById('arabic-duaa-container');
+            if(!duaaEl) return;
+            
+            // Animation fade-out
+            duaaEl.style.opacity = '0';
+            
+            setTimeout(() => {
+                // Changer le texte
+                duaaEl.innerText = arabicDuaas[Math.floor(Math.random() * arabicDuaas.length)];
+                // Animation fade-in
+                duaaEl.style.opacity = '1';
+            }, 700); // Attendre que l'opacité soit à 0
+        }
+
+        // Changer la Douâa toutes les 6 secondes
+        setInterval(rotateDuaa, 6000);
+
+        // Démarrage auto si hors ligne et direct
+        window.onload = () => {
+            document.getElementById('onboarding').classList.remove('hidden');
+            rotateDuaa(); // Lancer la première Douâa
+        };
+
+    </script>
+</body>
+</html>
