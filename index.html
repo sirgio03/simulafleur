@@ -1,79 +1,53 @@
 <!DOCTYPE html>
-<html lang="fr" dir="ltr">
+<html lang="fr" dir="ltr" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mon Simulateur M1 Banana 🍌</title>
+    <title>Simulateur M1 - Multi-Spécialités 🎓</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
+                }
+            }
+        }
+        
+        // Initialiser le thème (Sauvegarde le choix de l'utilisateur)
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
     
     <style>
-        :root {
-            --bg-color: #0f0f11;
-            --card-bg: rgba(24, 24, 27, 0.85); /* Zinc 900 transparent */
-            --primary: #FFE135; /* Banana Yellow */
-            --primary-dark: #D4B200;
-            --secondary: #FFB000;
-            --text-main: #f4f4f5; /* Zinc 100 */
-            --text-muted: #a1a1aa; /* Zinc 400 */
-            --success: #34d399;
-            --danger: #fb7185;
-            --input-bg: #27272a; /* Zinc 800 */
-        }
-
         body {
-            font-family: 'Nunito', sans-serif;
-            background: linear-gradient(135deg, #09090b 0%, #18181b 100%);
-            color: var(--text-main);
-            min-height: 100vh;
+            transition: background-color 0.3s, color 0.3s;
             overflow-x: hidden;
             background-attachment: fixed;
         }
 
-        #particles {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            pointer-events: none; z-index: 0;
-        }
-        .particle {
-            position: absolute; font-size: 1.5rem; opacity: 0.6;
-            animation: floatUp linear forwards;
-            filter: drop-shadow(0 2px 4px rgba(255,225,53,0.2));
-        }
-        @keyframes floatUp {
-            0% { transform: translateY(0) scale(0.5) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(-120px) scale(1.5) rotate(360deg); opacity: 0; }
-        }
-
-        .glass-panel {
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            border-radius: 24px;
-            border: 1px solid rgba(255, 225, 53, 0.15);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
-            position: relative;
-            z-index: 10;
-        }
-
-        .cute-input {
-            width: 100%;
-            padding: 8px 12px;
-            border: 2px solid #3f3f46;
-            border-radius: 12px;
-            font-size: 0.95rem;
-            font-weight: 800;
-            color: var(--text-main);
-            background: var(--input-bg);
-            outline: none;
-            transition: all 0.3s ease;
-        }
-        .cute-input:focus { border-color: var(--primary); box-shadow: 0 0 15px rgba(255, 225, 53, 0.2); transform: scale(1.02); }
-        .cute-input::placeholder { color: #52525b; }
+        /* Mode Sombre */
+        .dark body { background: linear-gradient(135deg, #09090b 0%, #18181b 100%); color: #f4f4f5; }
+        .dark .glass-panel { background: rgba(24, 24, 27, 0.85); border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5); }
+        .dark .cute-input { background: #27272a; border-color: #3f3f46; color: #f4f4f5; }
+        .dark .cute-input:focus { border-color: #3b82f6; box-shadow: 0 0 15px rgba(59, 130, 246, 0.2); }
+        
+        /* Mode Clair */
+        body { background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%); color: #0f172a; }
+        .glass-panel { background: rgba(255, 255, 255, 0.9); border: 1px solid rgba(0, 0, 0, 0.05); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05); backdrop-filter: blur(12px); border-radius: 24px; position: relative; z-index: 10; }
+        .cute-input { width: 100%; padding: 8px 12px; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 0.95rem; font-weight: 800; background: #f8fafc; color: #0f172a; outline: none; transition: all 0.3s ease; }
+        .cute-input:focus { border-color: #3b82f6; box-shadow: 0 0 15px rgba(59, 130, 246, 0.2); transform: scale(1.02); }
         
         /* Optimisations pour Mobile */
         @media (max-width: 768px) {
-            .cute-input { font-size: 16px !important; } /* Empêche le zoom auto sur iOS */
-            /* Cache les flèches haut/bas des inputs number sur mobile pour gagner de la place */
+            .cute-input { font-size: 16px !important; }
             input[type="number"]::-webkit-inner-spin-button, 
             input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
             input[type="number"] { -moz-appearance: textfield; }
@@ -81,139 +55,161 @@
 
         .grade-input { text-align: center; }
 
-        .btn-banana {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: #18181b; border: none; padding: 12px 24px; border-radius: 16px;
-            font-weight: 900; font-size: 1.1rem; cursor: pointer;
-            box-shadow: 0 8px 20px rgba(255, 225, 53, 0.2);
-            transition: all 0.2s;
-        }
-        .btn-banana:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(255, 225, 53, 0.3); }
-        .btn-banana:active { transform: translateY(1px); }
+        /* Boutons */
+        .btn-primary { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; border: none; padding: 12px 24px; border-radius: 16px; font-weight: 900; font-size: 1.1rem; cursor: pointer; box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3); transition: all 0.2s; }
+        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(59, 130, 246, 0.4); }
+        .btn-primary:active { transform: translateY(1px); }
 
-        .btn-outline {
-            background: transparent; border: 2px solid var(--primary); color: var(--primary);
-            padding: 8px 16px; border-radius: 12px; font-weight: 800; cursor: pointer; transition: all 0.2s;
-        }
-        .btn-outline:hover { background: var(--primary); color: #18181b; }
+        .btn-outline { background: transparent; border: 2px solid #3b82f6; color: #3b82f6; padding: 8px 16px; border-radius: 12px; font-weight: 800; cursor: pointer; transition: all 0.2s; }
+        .btn-outline:hover { background: #3b82f6; color: white; }
 
-        .mascot-container { animation: floatMascot 3.5s ease-in-out infinite; filter: drop-shadow(0 10px 15px rgba(255,225,53,0.15)); }
-        @keyframes floatMascot {
-            0%, 100% { transform: translateY(0px) rotate(-2deg); }
-            50% { transform: translateY(-12px) rotate(2deg); }
+        /* Animation Logo Éducation */
+        .edu-logo { animation: floatLogo 4s ease-in-out infinite; }
+        @keyframes floatLogo {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
         }
 
-        .badge-acquis { background: rgba(52, 211, 153, 0.15); color: #34d399; border: 1px solid #059669; }
-        .badge-rattrapage { background: rgba(251, 113, 133, 0.15); color: #fb7185; border: 1px solid #e11d48; }
-
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px);
-            z-index: 1000; display: flex; align-items: center; justify-content: center;
-            opacity: 0; pointer-events: none; transition: opacity 0.3s;
-            padding: 1rem;
+        /* Particules et Réactions */
+        .particle { position: absolute; font-size: 1.5rem; opacity: 0.8; animation: floatUp linear forwards; pointer-events: none; z-index: 50; }
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(0.5) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-120px) scale(1.5) rotate(360deg); opacity: 0; }
         }
+
+        .pop-reaction { position: absolute; font-size: 2rem; pointer-events: none; z-index: 100; animation: popUp 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        @keyframes popUp {
+            0% { transform: scale(0.5) translateY(0); opacity: 1; }
+            50% { transform: scale(1.5) translateY(-40px); opacity: 1; }
+            100% { transform: scale(1) translateY(-80px); opacity: 0; }
+        }
+
+        /* Graduation Celebration */
+        .falling-confetti { position: fixed; top: -10vh; font-size: 2rem; z-index: 9999; animation: fall linear forwards; pointer-events: none; }
+        @keyframes fall {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+        }
+
+        /* Barre de Progression Crédits */
+        .progress-track { background: #e2e8f0; border-radius: 20px; height: 16px; width: 100%; overflow: hidden; position: relative; }
+        .dark .progress-track { background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255,255,255,0.1); }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #3b82f6, #10b981); border-radius: 20px; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+        
+        .marker-45 { position: absolute; top: 0; left: 75%; width: 4px; height: 100%; background: #eab308; z-index: 10; box-shadow: 0 0 10px #eab308; }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); z-index: 1000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; padding: 1rem; }
         .modal-overlay.active { opacity: 1; pointer-events: auto; }
-        .modal-content {
-            background: var(--card-bg); padding: 24px; border-radius: 24px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5); transform: translateY(20px);
-            transition: transform 0.3s; text-align: center; max-width: 100%; width: 360px;
-            border: 2px solid var(--primary);
-        }
+        .modal-content { background: var(--card-bg); padding: 24px; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.5); transform: translateY(20px); transition: transform 0.3s; text-align: center; max-width: 100%; width: 360px; border: 2px solid #3b82f6; }
         .modal-overlay.active .modal-content { transform: translateY(0); }
+        .dark .modal-content { background: #18181b; }
+        .modal-content:not(.dark) { background: #ffffff; }
 
-        #toast {
-            position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px);
-            background: var(--card-bg); backdrop-filter: blur(10px);
-            border: 2px solid var(--primary); padding: 12px 24px; border-radius: 20px;
-            font-weight: 800; color: var(--primary); box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            z-index: 2000; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            display: flex; align-items: center; gap: 10px;
-        }
-        #toast.show { transform: translateX(-50%) translateY(0); }
-
-        input[type="number"] { touch-action: manipulation; }
-
+        /* Séparateur S1 / S2 Brillant */
+        .shining-bar-container { position: relative; margin: 3rem 0 2rem 0; display: flex; align-items: center; justify-content: center; }
+        .shining-line { position: absolute; width: 100%; height: 4px; border-radius: 4px; background: linear-gradient(90deg, #10b981 0%, #fde047 30%, #10b981 60%, #fde047 100%); background-size: 200% auto; animation: shine 3s linear infinite; box-shadow: 0 0 15px rgba(16, 185, 129, 0.6), 0 0 25px rgba(253, 224, 71, 0.4); }
+        @keyframes shine { to { background-position: 200% center; } }
+        .shining-badge { position: relative; z-index: 1; padding: 0.5rem 2rem; border-radius: 9999px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; border: 2px solid #fde047; box-shadow: 0 0 20px rgba(16, 185, 129, 0.5); transition: all 0.3s; }
+        .dark .shining-badge { background: #022c22; color: #fde047; }
+        body:not(.dark) .shining-badge { background: #ecfdf5; color: #065f46; }
     </style>
 </head>
 <body>
 
-    <div id="particles"></div>
-
-    <div id="toast">
-        <span class="text-2xl">🍌</span>
-        <span id="toastMessage">Message</span>
-    </div>
+    <!-- Toggle Theme Button -->
+    <button onclick="toggleTheme()" class="fixed top-4 right-4 z-50 p-3 rounded-full glass-panel !border-none !shadow-lg hover:scale-110 transition-transform">
+        <span id="theme-icon-dark" class="hidden text-xl">🌙</span>
+        <span id="theme-icon-light" class="hidden text-xl">☀️</span>
+    </button>
 
     <div id="confirmModal" class="modal-overlay">
-        <div class="modal-content">
-            <div class="text-4xl mb-3">⚠️</div>
-            <h3 class="text-xl font-black text-zinc-100 mb-6" id="confirmText">Es-tu sûr ?</h3>
+        <div class="modal-content dark:bg-zinc-900 bg-white">
+            <div class="text-4xl mb-3 text-blue-500">🎓</div>
+            <h3 class="text-xl font-black dark:text-zinc-100 text-gray-900 mb-6" id="confirmText">Es-tu sûr ?</h3>
             <div class="flex flex-col md:flex-row gap-3 justify-center">
-                <button onclick="closeModal()" class="btn-outline !border-zinc-500 !text-zinc-300 hover:!bg-zinc-800">Annuler</button>
-                <button id="confirmBtn" class="btn-banana !from-red-500 !to-red-600 !text-white !shadow-red-500/20 border-none">Oui, supprimer</button>
+                <button onclick="closeModal()" class="btn-outline !border-gray-500 !text-gray-500 hover:!bg-gray-200 dark:hover:!bg-zinc-800">Annuler</button>
+                <button id="confirmBtn" class="btn-primary !from-red-500 !to-red-600 !shadow-red-500/20">Oui, supprimer</button>
             </div>
         </div>
     </div>
 
-    <div id="onboarding" class="max-w-md mx-auto mt-10 md:mt-20 relative z-10 px-4">
+    <div id="onboarding" class="max-w-md mx-auto mt-10 md:mt-20 relative z-10 px-4 transition-all duration-500">
         <div class="glass-panel text-center p-6 md:p-8">
-            <div class="mascot-container w-28 h-28 md:w-36 md:h-36 mx-auto mb-4">
-                <!-- Mascotte Banane Mignonne -->
-                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                    <!-- Stem -->
-                    <path d="M 45 15 L 55 15 L 52 25 L 48 25 Z" fill="#654321"/>
-                    <!-- Banana Body -->
-                    <path d="M 52 25 C 85 30 85 75 50 95 C 15 75 25 30 48 25 Z" fill="#FFE135"/>
-                    <!-- Eyes -->
-                    <circle cx="40" cy="55" r="4.5" fill="#18181b"/>
-                    <circle cx="60" cy="55" r="4.5" fill="#18181b"/>
-                    <circle cx="41.5" cy="53.5" r="1.5" fill="white"/>
-                    <circle cx="61.5" cy="53.5" r="1.5" fill="white"/>
-                    <!-- Blush -->
-                    <ellipse cx="32" cy="62" rx="5" ry="3" fill="#f97316" opacity="0.5"/>
-                    <ellipse cx="68" cy="62" rx="5" ry="3" fill="#f97316" opacity="0.5"/>
-                    <!-- Smile -->
-                    <path d="M 45 65 Q 50 72 55 65" fill="none" stroke="#18181b" stroke-width="3" stroke-linecap="round"/>
-                    <!-- Sparkles -->
-                    <path d="M 20 30 L 25 35 L 30 30 L 25 25 Z" fill="#FFB000"/>
-                    <path d="M 75 40 L 80 43 L 85 40 L 80 37 Z" fill="#FFB000"/>
+            <div class="flex justify-center mb-6">
+                <!-- Education Logo SVG -->
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-24 h-24 text-blue-600 dark:text-blue-400 edu-logo drop-shadow-lg">
+                    <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                    <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
                 </svg>
             </div>
-            <h1 class="text-xl md:text-2xl font-black text-yellow-400 mb-2">Bienvenue en M1 ! 🍌</h1>
-            <p class="text-sm md:text-base text-zinc-400 font-semibold mb-6">Prêt(e) à valider l'année ? Comment t'appelles-tu ?</p>
+            <h1 class="text-2xl md:text-3xl font-black dark:text-zinc-100 text-gray-900 mb-2">Simulateur LMD</h1>
+            <p class="text-sm md:text-base dark:text-zinc-400 text-gray-600 font-semibold mb-6">Prêt(e) à valider l'année ?</p>
             
-            <input type="text" id="studentNameInput" class="cute-input mb-6 text-center text-lg py-3" placeholder="Ton prénom ici...">
-            <button onclick="startSession()" class="btn-banana w-full">Bismillah, on commence ! ✨</button>
+            <input type="text" id="studentNameInput" class="cute-input mb-4 text-center text-lg py-3" placeholder="Ton prénom ici...">
+            
+            <div class="mb-6 text-left">
+                <label class="block text-sm font-bold dark:text-zinc-300 text-gray-700 mb-2">Choisis ta spécialité :</label>
+                <select id="specialtySelect" class="cute-input cursor-pointer">
+                    <option value="iaa">Intelligence Artificielle et Applications (IAA)</option>
+                    <option value="sid">Systèmes d'Information et Données (SID)</option>
+                    <option value="rsid">Réseaux et Systèmes Informatiques Distribués (RSID)</option>
+                </select>
+            </div>
+
+            <button onclick="startSession()" class="btn-primary w-full">Bismillah, on commence ! ✨</button>
         </div>
     </div>
 
-    <div id="dashboard" class="hidden max-w-6xl mx-auto mt-6 md:mt-8 mb-12 space-y-6 md:space-y-8 relative z-10 px-2 md:px-4">
+    <div id="dashboard" class="hidden max-w-6xl mx-auto mt-6 md:mt-8 mb-12 space-y-6 md:space-y-8 relative z-10 px-2 md:px-4 transition-all duration-500">
         
-        <!-- Header Dashboard with Mobile Grid -->
-        <div class="glass-panel flex flex-col lg:flex-row items-center justify-between gap-6 p-4 md:p-6">
-            <div class="w-full lg:w-auto text-center lg:text-left">
-                <h1 class="text-2xl md:text-3xl font-black text-yellow-400 mb-2 flex items-center justify-center lg:justify-start gap-2 md:gap-3" id="dash-greeting">Salut !</h1>
-                <p class="text-sm md:text-base text-zinc-300 font-bold" id="dash-duaa">Rabi ywaf9ek dans tes études ! 🤲✨</p>
-                <div class="mt-3 bg-zinc-800/80 p-2 md:p-3 rounded-xl border border-zinc-700 inline-block w-full lg:w-auto">
-                    <p class="text-[10px] md:text-xs text-yellow-500 font-bold uppercase mb-1">Objectif Actuel :</p>
-                    <p class="text-xs md:text-sm font-black text-zinc-100" id="dash-objective">Calcul en cours...</p>
+        <!-- Header -->
+        <div class="glass-panel flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6 p-4 md:p-6 mb-4">
+            <div class="w-full md:w-auto text-center md:text-left flex flex-col md:flex-row items-center gap-4">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-16 h-16 text-blue-600 dark:text-blue-400 edu-logo hidden md:block">
+                    <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                    <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+                </svg>
+                <div>
+                    <h1 class="text-xl md:text-3xl font-black dark:text-zinc-100 text-gray-900 mb-1" id="dash-greeting">Salut !</h1>
+                    <p class="text-xs md:text-sm dark:text-zinc-400 text-gray-600 font-bold" id="dash-specialty">Spécialité : IAA</p>
                 </div>
             </div>
-            <!-- Mobile responsive Grid for Stats -->
-            <div class="grid grid-cols-2 md:flex gap-3 md:gap-4 w-full lg:w-auto">
-                <div class="text-center bg-zinc-800/50 p-3 md:p-4 rounded-2xl border border-zinc-700 shadow-sm flex flex-col justify-center">
-                    <p class="text-[10px] md:text-xs font-black text-zinc-400 uppercase">Moy. S1</p>
-                    <p class="text-2xl md:text-3xl font-black text-zinc-100" id="dash-s1-avg">0.00</p>
+            
+            <div class="grid grid-cols-2 md:flex gap-3 md:gap-4 w-full md:w-auto">
+                <div class="text-center dark:bg-zinc-800/50 bg-gray-100 p-3 md:p-4 rounded-2xl border dark:border-zinc-700 border-gray-200 shadow-sm flex flex-col justify-center">
+                    <p class="text-[10px] md:text-xs font-black dark:text-zinc-400 text-gray-500 uppercase">Moy. S1</p>
+                    <p class="text-2xl md:text-3xl font-black dark:text-zinc-100 text-gray-900" id="dash-s1-avg">0.00</p>
                 </div>
-                <div class="text-center bg-zinc-800/50 p-3 md:p-4 rounded-2xl border border-zinc-700 shadow-sm flex flex-col justify-center">
-                    <p class="text-[10px] md:text-xs font-black text-zinc-400 uppercase">Moy. S2</p>
-                    <p class="text-2xl md:text-3xl font-black text-zinc-100" id="dash-s2-avg">0.00</p>
+                <div class="text-center dark:bg-zinc-800/50 bg-gray-100 p-3 md:p-4 rounded-2xl border dark:border-zinc-700 border-gray-200 shadow-sm flex flex-col justify-center">
+                    <p class="text-[10px] md:text-xs font-black dark:text-zinc-400 text-gray-500 uppercase">Moy. S2</p>
+                    <p class="text-2xl md:text-3xl font-black dark:text-zinc-100 text-gray-900" id="dash-s2-avg">0.00</p>
                 </div>
-                <div class="col-span-2 text-center bg-gradient-to-br from-yellow-400 to-yellow-600 p-3 md:p-4 rounded-2xl shadow-lg transform md:hover:scale-105 transition-transform flex flex-col justify-center">
-                    <p class="text-[10px] md:text-xs font-black text-zinc-900 uppercase">Moyenne Annuelle</p>
-                    <p class="text-3xl md:text-4xl font-black text-zinc-900" id="dash-annual-avg">0.00</p>
+                <div class="col-span-2 text-center bg-gradient-to-br from-blue-500 to-indigo-600 p-3 md:p-4 rounded-2xl shadow-lg transform md:hover:scale-105 transition-transform flex flex-col justify-center">
+                    <p class="text-[10px] md:text-xs font-black text-white uppercase opacity-80">Moyenne Annuelle</p>
+                    <p class="text-3xl md:text-4xl font-black text-white" id="dash-annual-avg">0.00</p>
                 </div>
+            </div>
+        </div>
+
+        <!-- Progression Crédits -->
+        <div class="glass-panel p-4 md:p-6 mb-4">
+            <div class="flex justify-between items-end mb-2">
+                <div>
+                    <h2 class="text-sm md:text-lg font-black dark:text-zinc-100 text-gray-900">Progression Crédits 📚</h2>
+                    <p class="text-[10px] md:text-xs dark:text-zinc-400 text-gray-500 font-bold">Objectif : 45 Crédits pour passer avec dette</p>
+                </div>
+                <div class="text-right">
+                    <span class="text-xl md:text-2xl font-black text-blue-500" id="dash-total-credits">0</span>
+                    <span class="text-xs md:text-sm dark:text-zinc-400 text-gray-500 font-bold">/ 60</span>
+                </div>
+            </div>
+            <div class="progress-track mb-1">
+                <div class="progress-fill" id="credit-progress" style="width: 0%;"></div>
+                <div class="marker-45" title="Seuil de passage (45 Crédits)"></div>
+            </div>
+            
+            <div id="annual-status-box" class="mt-4 p-3 md:p-4 rounded-xl border font-bold text-sm text-center transition-colors">
+                <!-- Status Message Injected Here -->
             </div>
         </div>
 
@@ -224,26 +220,23 @@
 
         <!-- Boutons d'action -->
         <div class="flex justify-center gap-4 mt-6">
-            <button onclick="addUnit()" class="btn-outline border-dashed text-sm md:text-base">+ Ajouter un Semestre/Bloc</button>
+            <button onclick="addUnit()" class="btn-outline border-dashed text-sm md:text-base">+ Ajouter une UE</button>
         </div>
 
-        <div class="mt-12 md:mt-16 mb-8 text-center glass-panel !bg-zinc-900/40 border-none shadow-none p-4">
-            <div id="arabic-duaa-container" class="text-yellow-400 text-lg md:text-2xl font-black mb-6 transition-opacity duration-700 opacity-0 min-h-[50px] md:min-h-[40px] px-2" dir="rtl" style="font-family: 'Arial', sans-serif; line-height: 1.5;">
-                <!-- Généré par JS -->
+        <div class="mt-12 md:mt-16 mb-8 text-center glass-panel !bg-transparent border-none shadow-none p-4">
+            <div id="arabic-duaa-container" class="dark:text-blue-400 text-blue-600 text-lg md:text-2xl font-black mb-6 transition-opacity duration-700 opacity-0 min-h-[50px] px-2" dir="rtl" style="font-family: 'Arial', sans-serif; line-height: 1.5;">
             </div>
             
             <div class="flex flex-col md:flex-row justify-center items-center gap-4">
-                <div class="inline-flex items-center gap-2 bg-zinc-800/60 px-4 py-2 rounded-full border border-zinc-700 shadow-sm">
-                    <span class="text-zinc-400 font-bold text-xs md:text-sm">Créé avec 💛 par</span>
-                    <a href="https://instagram.com/sirgio03" target="_blank" class="text-yellow-400 hover:text-yellow-300 font-black flex items-center gap-1.5 transition-all hover:scale-105 text-sm md:text-base">
-                        <svg class="w-4 h-4 md:w-5 md:h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.08c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.06-4.123.06h-.08c-2.643 0-2.987-.012-4.043-.06-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.06-1.379-.06-3.808v-.63c0-2.43.013-2.784.06-3.808.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 015.45 2.525c.636-.247 1.363-.416 2.427-.465C8.901 2.013 9.256 2 11.685 2h.63zm-.081 1.802h-.468c-2.456 0-2.784.011-3.807.058-.975.045-1.504.207-1.857.344-.467.182-.8.398-1.15.748-.35.35-.566.683-.748 1.15-.137.353-.3.882-.344 1.857-.047 1.023-.058 1.351-.058 3.807v.468c0 2.456.011 2.784.058 3.807.045.975.207 1.504.344 1.857.182.466.399.8.748 1.15.35.35.683.566 1.15.748.353.137.882.3 1.857.344 1.054.048 1.37.058 4.041.058h.08c2.597 0 2.917-.01 3.96-.058.976-.045 1.505-.207 1.858-.344.466-.182.8-.398 1.15-.748.35-.35.566-.683.748-1.15.137-.353.3-.882.344-1.857.048-1.055.058-1.37.058-4.041v-.08c0-2.597-.01-2.917-.058-3.96-.045-.976-.207-1.505-.344-1.858a3.097 3.097 0 00-.748-1.15 3.098 3.098 0 00-1.15-.748c-.353-.137-.882-.3-1.857-.344-1.023-.047-1.351-.058-3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z" clip-rule="evenodd" /></svg>
+                <div class="inline-flex items-center gap-2 dark:bg-zinc-800/60 bg-white/60 px-4 py-2 rounded-full border dark:border-zinc-700 border-gray-200 shadow-sm">
+                    <span class="dark:text-zinc-400 text-gray-600 font-bold text-xs md:text-sm">Créé avec 💙 par</span>
+                    <a href="https://instagram.com/sirgio03" target="_blank" class="dark:text-blue-400 text-blue-600 hover:text-blue-500 font-black flex items-center gap-1.5 transition-all hover:scale-105 text-sm md:text-base">
                         @sirgio03
                     </a>
                 </div>
                 
-                <div class="inline-flex items-center gap-2 bg-zinc-800/60 px-4 py-2 rounded-full border border-zinc-700 shadow-sm">
-                    <a href="https://github.com/sirgio03" target="_blank" class="text-zinc-300 hover:text-white font-black flex items-center gap-1.5 transition-all hover:scale-105 text-sm md:text-base">
-                        <svg class="w-4 h-4 md:w-5 md:h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd" /></svg>
+                <div class="inline-flex items-center gap-2 dark:bg-zinc-800/60 bg-white/60 px-4 py-2 rounded-full border dark:border-zinc-700 border-gray-200 shadow-sm">
+                    <a href="https://github.com/sirgio03" target="_blank" class="dark:text-zinc-300 text-gray-700 hover:text-black dark:hover:text-white font-black flex items-center gap-1.5 transition-all hover:scale-105 text-sm md:text-base">
                         GitHub
                     </a>
                 </div>
@@ -253,82 +246,220 @@
     </div>
 
     <script type="module">
-        // Base structure (Empty for normal users)
-        const emptyUnits = [
-            {
-                id: "s1", name: "🎒 Semestre 1",
-                modules: [
-                    { id: "s1_m1", name: "Modélisation et Simulation", coef: 2, cc: null, exam: null, rattrapage: null },
-                    { id: "s1_m2", name: "Algo. et Systèmes Répartis", coef: 2, cc: null, exam: null, rattrapage: null },
-                    { id: "s1_m3", name: "Recherche Opérationnelle", coef: 2, cc: null, exam: null, rattrapage: null },
-                    { id: "s1_m4", name: "Analyse de Données", coef: 2, cc: null, exam: null, rattrapage: null },
-                    { id: "s1_m5", name: "Bases de Données", coef: 3, cc: null, exam: null, rattrapage: null },
-                    { id: "s1_m6", name: "Apprentissage Automatique", coef: 1, cc: null, exam: null, rattrapage: null },
-                    { id: "s1_m7", name: "Traitement Numérique du Signal", coef: 1, cc: null, exam: null, rattrapage: null },
-                    { id: "s1_m8", name: "Fondements Logiques", coef: 1, cc: null, exam: null, rattrapage: null },
-                    { id: "s1_m9", name: "Sémantique Formelle", coef: 2, cc: null, exam: null, rattrapage: null },
-                    { id: "s1_m10", name: "Ethique et Déontologie", coef: 1, cc: null, exam: null, rattrapage: null }
-                ]
-            },
-            {
-                id: "s2", name: "🍌 Semestre 2",
-                modules: [
-                    { id: "s2_m1", name: "Traitement de la Parole", coef: 2, cc: null, exam: null, rattrapage: null },
-                    { id: "s2_m2", name: "Traitement Auto. du Langage", coef: 2, cc: null, exam: null, rattrapage: null },
-                    { id: "s2_m3", name: "Théorie de l'Information", coef: 1, cc: null, exam: null, rattrapage: null },
-                    { id: "s2_m4", name: "Géométrie Algorithmique", coef: 2, cc: null, exam: null, rattrapage: null },
-                    { id: "s2_m5", name: "Vision Artificielle", coef: 2, cc: null, exam: null, rattrapage: null },
-                    { id: "s2_m6", name: "Traitement d'Images", coef: 2, cc: null, exam: null, rattrapage: null },
-                    { id: "s2_m7", name: "Modélisation 3D", coef: 3, cc: null, exam: null, rattrapage: null },
-                    { id: "s2_m8", name: "Agents et Systèmes Multi", coef: 2, cc: null, exam: null, rattrapage: null },
-                    { id: "s2_m9", name: "Reconnaissance des Formes", coef: 1, cc: null, exam: null, rattrapage: null }
-                ]
-            }
-        ];
-
-        // Easter Egg structure (Pre-filled for Siradj)
-        const siradjUnits = [
-            {
-                id: "s1", name: "🎒 Semestre 1",
-                modules: [
-                    { id: "s1_m1", name: "Modélisation et Simulation", coef: 2, cc: 16.25, exam: 3.75, rattrapage: null },
-                    { id: "s1_m2", name: "Algo. et Systèmes Répartis", coef: 2, cc: 11.00, exam: 8.50, rattrapage: null },
-                    { id: "s1_m3", name: "Recherche Opérationnelle", coef: 2, cc: 9.25, exam: 6.00, rattrapage: null },
-                    { id: "s1_m4", name: "Analyse de Données", coef: 2, cc: 0.50, exam: 10.50, rattrapage: null },
-                    { id: "s1_m5", name: "Bases de Données", coef: 3, cc: 9.875, exam: 1.50, rattrapage: null },
-                    { id: "s1_m6", name: "Apprentissage Automatique", coef: 1, cc: null, exam: 8.00, rattrapage: null },
-                    { id: "s1_m7", name: "Traitement Numérique du Signal", coef: 1, cc: null, exam: 8.50, rattrapage: null },
-                    { id: "s1_m8", name: "Fondements Logiques", coef: 1, cc: null, exam: 5.25, rattrapage: null },
-                    { id: "s1_m9", name: "Sémantique Formelle", coef: 2, cc: 2.25, exam: 5.00, rattrapage: null },
-                    { id: "s1_m10", name: "Ethique et Déontologie", coef: 1, cc: null, exam: 16.00, rattrapage: null }
-                ]
-            },
-            {
-                id: "s2", name: "🍌 Semestre 2",
-                modules: [
-                    { id: "s2_m1", name: "Traitement de la Parole", coef: 2, cc: 17.00, exam: 7.00, rattrapage: null },
-                    { id: "s2_m2", name: "Traitement Auto. du Langage", coef: 2, cc: 14.00, exam: 12.00, rattrapage: null },
-                    { id: "s2_m3", name: "Théorie de l'Information", coef: 1, cc: null, exam: 15.00, rattrapage: null },
-                    { id: "s2_m4", name: "Géométrie Algorithmique", coef: 2, cc: 13.00, exam: 11.50, rattrapage: null },
-                    { id: "s2_m5", name: "Vision Artificielle", coef: 2, cc: 14.50, exam: 7.00, rattrapage: null },
-                    { id: "s2_m6", name: "Traitement d'Images", coef: 2, cc: 14.50, exam: 10.50, rattrapage: null },
-                    { id: "s2_m7", name: "Modélisation 3D", coef: 3, cc: 13.54, exam: 8.50, rattrapage: null },
-                    { id: "s2_m8", name: "Agents et Systèmes Multi", coef: 2, cc: 13.00, exam: 10.00, rattrapage: null },
-                    { id: "s2_m9", name: "Reconnaissance des Formes", coef: 1, cc: null, exam: 7.50, rattrapage: null }
-                ]
-            }
-        ];
-
-        let state = { name: "", units: [] };
-
-        window.showToast = (msg) => {
-            const toast = document.getElementById('toast');
-            document.getElementById('toastMessage').innerText = msg;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
+        // Theme Toggle Logic
+        window.toggleTheme = () => {
+            document.documentElement.classList.toggle('dark');
+            const isDark = document.documentElement.classList.contains('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            updateThemeIcon();
         };
 
+        function updateThemeIcon() {
+            const isDark = document.documentElement.classList.contains('dark');
+            document.getElementById('theme-icon-dark').classList.toggle('hidden', isDark);
+            document.getElementById('theme-icon-light').classList.toggle('hidden', !isDark);
+        }
+        updateThemeIcon(); // Run on load
+
+        // Database of Specialties
+        const db = {
+            s1_common: [
+                {
+                    id: "s1_uef", name: "🎒 UEF 1 (Fondamentale)", type: "UE", creditsTarget: 12, semester: 1,
+                    modules: [
+                        { id: "mod", name: "Modélisation et Simulation", coef: 2, cred: 4, cc: null, exam: null, rattrapage: null },
+                        { id: "ad", name: "Analyse de Données", coef: 2, cred: 4, cc: null, exam: null, rattrapage: null },
+                        { id: "roc", name: "Recherche Opérationnelle", coef: 2, cred: 4, cc: null, exam: null, rattrapage: null }
+                    ]
+                },
+                {
+                    id: "s1_uef2", name: "🎒 UEF 2 (Fondamentale)", type: "UE", creditsTarget: 6, semester: 1,
+                    modules: [
+                        { id: "aa", name: "Apprentissage Automatique", coef: 1, cred: 2, cc: null, exam: null, rattrapage: null },
+                        { id: "tns", name: "Traitement Numérique du Signal", coef: 1, cred: 2, cc: null, exam: null, rattrapage: null },
+                        { id: "fl", name: "Fondements Logiques", coef: 1, cred: 2, cc: null, exam: null, rattrapage: null }
+                    ]
+                },
+                {
+                    id: "s1_uem", name: "🎒 UEM (Méthodologique)", type: "UE", creditsTarget: 9, semester: 1,
+                    modules: [
+                        { id: "bdd", name: "Bases de Données", coef: 3, cred: 5, cc: null, exam: null, rattrapage: null },
+                        { id: "asr", name: "Algo. et Systèmes Répartis", coef: 2, cred: 4, cc: null, exam: null, rattrapage: null }
+                    ]
+                },
+                {
+                    id: "s1_uet", name: "🎒 UET (Transversale)", type: "UE", creditsTarget: 2, semester: 1,
+                    modules: [{ id: "sf", name: "Sémantique Formelle", coef: 2, cred: 2, cc: null, exam: null, rattrapage: null }]
+                },
+                {
+                    id: "s1_ued", name: "🎒 UED (Découverte)", type: "UE", creditsTarget: 1, semester: 1,
+                    modules: [{ id: "eth", name: "Ethique et Déontologie", coef: 1, cred: 1, cc: null, exam: null, rattrapage: null }]
+                }
+            ],
+            iaa_s2: [
+                {
+                    id: "s2_uef1", name: "🎓 IAA - UEF 1", type: "UE", creditsTarget: 10, semester: 2,
+                    modules: [
+                        { id: "par", name: "Traitement de la Parole", coef: 2, cred: 4, cc: null, exam: null, rattrapage: null },
+                        { id: "tal", name: "Traitement Auto. du Langage", coef: 2, cred: 4, cc: null, exam: null, rattrapage: null },
+                        { id: "info", name: "Théorie de l'Information", coef: 1, cred: 2, cc: null, exam: null, rattrapage: null }
+                    ]
+                },
+                {
+                    id: "s2_uef2", name: "🎓 IAA - UEF 2", type: "UE", creditsTarget: 8, semester: 2,
+                    modules: [
+                        { id: "geo", name: "Géométrie Algorithmique", coef: 2, cred: 4, cc: null, exam: null, rattrapage: null },
+                        { id: "vis", name: "Vision Artificielle", coef: 2, cred: 4, cc: null, exam: null, rattrapage: null }
+                    ]
+                },
+                {
+                    id: "s2_uem", name: "🎓 IAA - UEM", type: "UE", creditsTarget: 9, semester: 2,
+                    modules: [
+                        { id: "img", name: "Traitement d'Images", coef: 2, cred: 4, cc: null, exam: null, rattrapage: null },
+                        { id: "m3d", name: "Modélisation 3D", coef: 3, cred: 5, cc: null, exam: null, rattrapage: null }
+                    ]
+                },
+                {
+                    id: "s2_ued", name: "🎓 IAA - UED", type: "UE", creditsTarget: 2, semester: 2,
+                    modules: [{ id: "sma", name: "Agents et Systèmes Multi", coef: 2, cred: 2, cc: null, exam: null, rattrapage: null }]
+                },
+                {
+                    id: "s2_uet", name: "🎓 IAA - UET", type: "UE", creditsTarget: 1, semester: 2,
+                    modules: [{ id: "rcf", name: "Reconnaissance des Formes", coef: 1, cred: 1, cc: null, exam: null, rattrapage: null }]
+                }
+            ],
+            sid_s2: [
+                {
+                    id: "sid_uef1", name: "📊 SID - UEF 1", type: "UE", creditsTarget: 10, semester: 2,
+                    modules: [
+                        { id: "sec", name: "Sécurité Qualité Données", coef: 3, cred: 6, cc: null, exam: null, rattrapage: null },
+                        { id: "cc", name: "Cloud Computing", coef: 2, cred: 4, cc: null, exam: null, rattrapage: null }
+                    ]
+                },
+                {
+                    id: "sid_uef2", name: "📊 SID - UEF 2", type: "UE", creditsTarget: 8, semester: 2,
+                    modules: [
+                        { id: "sma", name: "Agents et Systèmes Multi", coef: 2, cred: 4, cc: null, exam: null, rattrapage: null },
+                        { id: "idm", name: "Ingénierie des Modèles", coef: 2, cred: 4, cc: null, exam: null, rattrapage: null }
+                    ]
+                },
+                {
+                    id: "sid_uem", name: "📊 SID - UEM", type: "UE", creditsTarget: 9, semester: 2,
+                    modules: [
+                        { id: "bdm", name: "Bases multidimensionnelles", coef: 3, cred: 5, cc: null, exam: null, rattrapage: null },
+                        { id: "grille", name: "Grilles Informatiques", coef: 2, cred: 4, cc: null, exam: null, rattrapage: null }
+                    ]
+                },
+                {
+                    id: "sid_ued", name: "📊 SID - UED", type: "UE", creditsTarget: 1, semester: 2,
+                    modules: [{ id: "opt", name: "Optimisation indus.", coef: 1, cred: 1, cc: null, exam: null, rattrapage: null }]
+                },
+                {
+                    id: "sid_uet", name: "📊 SID - UET", type: "UE", creditsTarget: 2, semester: 2,
+                    modules: [{ id: "jeux", name: "Théorie des Jeux", coef: 2, cred: 2, cc: null, exam: null, rattrapage: null }]
+                }
+            ],
+            rsid_s2: [
+                 {
+                    id: "rsid_uef1", name: "🌐 RSID - UEF 1", type: "UE", creditsTarget: 10, semester: 2,
+                    modules: [
+                        { id: "tse", name: "Tech. Systèmes Embarqués", coef: 2, cred: 4, cc: null, exam: null, rattrapage: null },
+                        { id: "gc", name: "Grille de calcul", coef: 2, cred: 4, cc: null, exam: null, rattrapage: null },
+                        { id: "grp", name: "Gestion Réseaux & Politique", coef: 1, cred: 2, cc: null, exam: null, rattrapage: null }
+                    ]
+                },
+                {
+                    id: "rsid_uef2", name: "🌐 RSID - UEF 2", type: "UE", creditsTarget: 8, semester: 2,
+                    modules: [
+                        { id: "sma", name: "Agents et Systèmes Multi", coef: 2, cred: 4, cc: null, exam: null, rattrapage: null },
+                        { id: "pap", name: "Prog & Arch Parallèles", coef: 2, cred: 4, cc: null, exam: null, rattrapage: null }
+                    ]
+                },
+                {
+                    id: "rsid_uem", name: "🌐 RSID - UEM", type: "UE", creditsTarget: 9, semester: 2,
+                    modules: [
+                        { id: "secr", name: "Sécurité Réseaux", coef: 3, cred: 5, cc: null, exam: null, rattrapage: null },
+                        { id: "rh", name: "Réseaux hertziens", coef: 2, cred: 4, cc: null, exam: null, rattrapage: null }
+                    ]
+                },
+                {
+                    id: "rsid_ued", name: "🌐 RSID - UED", type: "UE", creditsTarget: 1, semester: 2,
+                    modules: [{ id: "opt", name: "Optimisation indus.", coef: 1, cred: 1, cc: null, exam: null, rattrapage: null }]
+                },
+                {
+                    id: "rsid_uet", name: "🌐 RSID - UET", type: "UE", creditsTarget: 2, semester: 2,
+                    modules: [{ id: "fd", name: "Fondements de la Décision", coef: 2, cred: 2, cc: null, exam: null, rattrapage: null }]
+                }
+            ]
+        };
+
+        const siradjM1 = [
+             {
+                id: "s1_uef", name: "🎒 UEF 1 (Fondamentale)", type: "UE", creditsTarget: 12, semester: 1,
+                modules: [
+                    { id: "mod", name: "Modélisation et Simulation", coef: 2, cred: 4, cc: 16.25, exam: 3.75, rattrapage: null },
+                    { id: "ad", name: "Analyse de Données", coef: 2, cred: 4, cc: 0.50, exam: 10.50, rattrapage: null },
+                    { id: "roc", name: "Recherche Opérationnelle", coef: 2, cred: 4, cc: 9.25, exam: 6.00, rattrapage: null }
+                ]
+            },
+            {
+                id: "s1_uef2", name: "🎒 UEF 2 (Fondamentale)", type: "UE", creditsTarget: 6, semester: 1,
+                modules: [
+                    { id: "aa", name: "Apprentissage Automatique", coef: 1, cred: 2, cc: null, exam: 8.00, rattrapage: null },
+                    { id: "tns", name: "Traitement Numérique du Signal", coef: 1, cred: 2, cc: null, exam: 8.50, rattrapage: null },
+                    { id: "fl", name: "Fondements Logiques", coef: 1, cred: 2, cc: null, exam: 5.25, rattrapage: null }
+                ]
+            },
+            {
+                id: "s1_uem", name: "🎒 UEM (Méthodologique)", type: "UE", creditsTarget: 9, semester: 1,
+                modules: [
+                    { id: "bdd", name: "Bases de Données", coef: 3, cred: 5, cc: 9.875, exam: 1.50, rattrapage: null },
+                    { id: "asr", name: "Algo. et Systèmes Répartis", coef: 2, cred: 4, cc: 11.00, exam: 8.50, rattrapage: null }
+                ]
+            },
+            {
+                id: "s1_uet", name: "🎒 UET (Transversale)", type: "UE", creditsTarget: 2, semester: 1,
+                modules: [{ id: "sf", name: "Sémantique Formelle", coef: 2, cred: 2, cc: 2.25, exam: 5.00, rattrapage: null }]
+            },
+            {
+                id: "s1_ued", name: "🎒 UED (Découverte)", type: "UE", creditsTarget: 1, semester: 1,
+                modules: [{ id: "eth", name: "Ethique et Déontologie", coef: 1, cred: 1, cc: null, exam: 16.00, rattrapage: null }]
+            },
+            {
+                id: "s2_uef1", name: "🎓 IAA - UEF 1", type: "UE", creditsTarget: 10, semester: 2,
+                modules: [
+                    { id: "par", name: "Traitement de la Parole", coef: 2, cred: 4, cc: 17.00, exam: 7.00, rattrapage: null },
+                    { id: "tal", name: "Traitement Auto. du Langage", coef: 2, cred: 4, cc: 14.00, exam: 12.00, rattrapage: null },
+                    { id: "info", name: "Théorie de l'Information", coef: 1, cred: 2, cc: null, exam: 15.00, rattrapage: null }
+                ]
+            },
+            {
+                id: "s2_uef2", name: "🎓 IAA - UEF 2", type: "UE", creditsTarget: 8, semester: 2,
+                modules: [
+                    { id: "geo", name: "Géométrie Algorithmique", coef: 2, cred: 4, cc: 13.00, exam: 11.50, rattrapage: null },
+                    { id: "vis", name: "Vision Artificielle", coef: 2, cred: 4, cc: 14.50, exam: 7.00, rattrapage: null }
+                ]
+            },
+            {
+                id: "s2_uem", name: "🎓 IAA - UEM", type: "UE", creditsTarget: 9, semester: 2,
+                modules: [
+                    { id: "img", name: "Traitement d'Images", coef: 2, cred: 4, cc: 14.50, exam: 10.50, rattrapage: null },
+                    { id: "m3d", name: "Modélisation 3D", coef: 3, cred: 5, cc: 13.54, exam: 8.50, rattrapage: null }
+                ]
+            },
+            {
+                id: "s2_ued", name: "🎓 IAA - UED", type: "UE", creditsTarget: 2, semester: 2,
+                modules: [{ id: "sma", name: "Agents et Systèmes Multi", coef: 2, cred: 2, cc: 13.00, exam: 10.00, rattrapage: null }]
+            },
+            {
+                id: "s2_uet", name: "🎓 IAA - UET", type: "UE", creditsTarget: 1, semester: 2,
+                modules: [{ id: "rcf", name: "Reconnaissance des Formes", coef: 1, cred: 1, cc: null, exam: 7.50, rattrapage: null }]
+            }
+        ];
+
+        let state = { name: "", specialty: "", units: [], hasGraduated: false };
         let modalCallback = null;
+
         window.showConfirm = (text, callback) => {
             document.getElementById('confirmText').innerText = text;
             modalCallback = callback;
@@ -346,164 +477,260 @@
 
         window.startSession = () => {
             const nameInput = document.getElementById('studentNameInput').value.trim();
+            const specSelect = document.getElementById('specialtySelect').value;
+            
             if(!nameInput) return;
             
-            // Easter Egg Logic
             if (nameInput === "404") {
                 state.name = "Siradj";
-                state.units = JSON.parse(JSON.stringify(siradjUnits));
-                showToast("Easter Egg trouvé ! Bienvenue Boss !");
+                state.specialty = "iaa";
+                state.units = JSON.parse(JSON.stringify(siradjM1));
             } else {
                 state.name = nameInput;
-                state.units = JSON.parse(JSON.stringify(emptyUnits));
+                state.specialty = specSelect;
+                let s2_data = specSelect === "iaa" ? db.iaa_s2 : (specSelect === "sid" ? db.sid_s2 : db.rsid_s2);
+                state.units = JSON.parse(JSON.stringify([...db.s1_common, ...s2_data]));
             }
             
             document.getElementById('onboarding').classList.add('hidden');
             document.getElementById('dashboard').classList.remove('hidden');
             
-            document.getElementById('dash-greeting').innerHTML = `Marhaba, <span class="text-yellow-400">${state.name}</span> ! 🍌`;
-            document.getElementById('dash-duaa').innerText = `Qu'Allah te facilite et t'accorde la réussite, ${state.name} ! N'oublie pas tes prières 🤲✨`;
+            document.getElementById('dash-greeting').innerHTML = `Marhaba, <span class="text-blue-500">${state.name}</span> ! 🎓`;
+            document.getElementById('dash-specialty').innerText = `Spécialité : ${state.specialty.toUpperCase()}`;
             
             renderUnits();
         }
 
         function getModAvg(mod) {
-            let finalExam = mod.rattrapage !== null && mod.rattrapage !== "" ? parseFloat(mod.rattrapage) : parseFloat(mod.exam || 0);
+            let initialExam = parseFloat(mod.exam || 0);
+            let finalExam = mod.rattrapage !== null && mod.rattrapage !== "" ? parseFloat(mod.rattrapage) : initialExam;
+            
+            let initialAvg = initialExam;
+            let finalAvg = finalExam;
+
             if (mod.cc !== null && mod.cc !== "") {
-                return (parseFloat(mod.cc) + finalExam) / 2;
+                initialAvg = (parseFloat(mod.cc) + initialExam) / 2;
+                finalAvg = (parseFloat(mod.cc) + finalExam) / 2;
             }
-            return finalExam;
+            
+            return {
+                initial: initialAvg,
+                final: finalAvg,
+                isInitialAcquired: initialAvg >= 10.0
+            };
         }
 
         function getUnitStats(unit) {
-            let pts = 0, coefs = 0;
+            let pts = 0, initialPts = 0, coefs = 0, earnedCredits = 0;
+            
             unit.modules.forEach(mod => {
                 let c = parseFloat(mod.coef || 0);
-                pts += getModAvg(mod) * c;
+                let avgs = getModAvg(mod);
+                
+                pts += avgs.final * c;
+                initialPts += avgs.initial * c;
                 coefs += c;
+                
+                if (avgs.final >= 10.0) {
+                    earnedCredits += parseFloat(mod.cred || 0);
+                }
             });
+            
             let avg = coefs > 0 ? (pts / coefs) : 0;
-            return { avg, pts, coefs, isAcquired: avg >= 10.0 };
+            let initialAvg = coefs > 0 ? (initialPts / coefs) : 0;
+            let isAcquired = avg >= 10.0;
+            
+            let finalCredits = isAcquired ? unit.creditsTarget : earnedCredits;
+
+            return { avg, initialAvg, pts, coefs, isAcquired, credits: finalCredits };
         }
 
         window.renderUnits = () => {
             const container = document.getElementById('units-container');
             container.innerHTML = '';
             
-            let globalPts = 0, globalCoefs = 0;
-            let unitStatsList = [];
+            let globalPts = 0, globalInitialPts = 0, globalCoefs = 0;
+            let s1Pts = 0, s1Coefs = 0;
+            let s2Pts = 0, s2Coefs = 0;
+            let totalCredits = 0;
 
-            state.units.forEach(unit => {
+            let unitStatsList = state.units.map(unit => {
                 const uStats = getUnitStats(unit);
-                unitStatsList.push(uStats);
                 globalPts += uStats.pts;
+                globalInitialPts += uStats.initialPts;
                 globalCoefs += uStats.coefs;
+                totalCredits += uStats.credits;
+                
+                if (unit.semester === 1) { s1Pts += uStats.pts; s1Coefs += uStats.coefs; }
+                else if (unit.semester === 2) { s2Pts += uStats.pts; s2Coefs += uStats.coefs; }
+                
+                return uStats;
             });
 
             const globalAvg = globalCoefs > 0 ? (globalPts / globalCoefs) : 0;
-            const isYearAcquired = globalAvg >= 10.0;
+            const globalInitialAvg = globalCoefs > 0 ? (globalInitialPts / globalCoefs) : 0;
+            const s1Avg = s1Coefs > 0 ? (s1Pts / s1Coefs) : 0;
+            const s2Avg = s2Coefs > 0 ? (s2Pts / s2Coefs) : 0;
+
+            // Logique LMD Globale
+            const isYearAcquiredInitial = globalInitialAvg >= 10.0;
+            const isYearAcquiredFinal = globalAvg >= 10.0;
+            
+            if (isYearAcquiredFinal) totalCredits = 60;
+
+            const isS1AcquiredInitial = s1Avg >= 10.0; // Simplification
+            const isS2AcquiredInitial = s2Avg >= 10.0; // Simplification
+
             const targetGlobalPts = 10.0 * globalCoefs;
             const globalDeficit = targetGlobalPts - globalPts;
 
+            // UI Updates
             document.getElementById('dash-annual-avg').innerText = globalAvg.toFixed(3);
-            if (unitStatsList.length >= 2) {
-                document.getElementById('dash-s1-avg').innerText = unitStatsList[0].avg.toFixed(2);
-                document.getElementById('dash-s2-avg').innerText = unitStatsList[1].avg.toFixed(2);
+            document.getElementById('dash-s1-avg').innerText = s1Avg.toFixed(2);
+            document.getElementById('dash-s2-avg').innerText = s2Avg.toFixed(2);
+            document.getElementById('dash-total-credits').innerText = totalCredits;
+            
+            let pct = Math.min(100, (totalCredits / 60) * 100);
+            document.getElementById('credit-progress').style.width = `${pct}%`;
+
+            const statusBox = document.getElementById('annual-status-box');
+            if (isYearAcquiredFinal) {
+                statusBox.innerHTML = "🎉 Année Validée par compensation (60 Crédits accordés) !";
+                statusBox.className = "mt-4 p-3 md:p-4 rounded-xl border font-bold text-sm text-center transition-colors dark:bg-emerald-900/30 bg-emerald-100 text-emerald-600 dark:text-emerald-400 border-emerald-500/50";
+                if(!state.hasGraduated) { triggerGraduation(); state.hasGraduated = true; }
+            } else if (totalCredits >= 45) {
+                statusBox.innerHTML = `⚠️ Passage avec dette autorisé (${totalCredits} Crédits acquis).`;
+                statusBox.className = "mt-4 p-3 md:p-4 rounded-xl border font-bold text-sm text-center transition-colors dark:bg-yellow-900/30 bg-yellow-100 text-yellow-600 dark:text-yellow-400 border-yellow-500/50";
+            } else {
+                statusBox.innerHTML = `❌ Ajourné. Il manque des crédits ou des points de compensation.`;
+                statusBox.className = "mt-4 p-3 md:p-4 rounded-xl border font-bold text-sm text-center transition-colors dark:bg-red-900/30 bg-red-100 text-red-600 dark:text-red-400 border-red-500/50";
             }
 
-            const objText = document.getElementById('dash-objective');
-            if (isYearAcquired) {
-                objText.innerHTML = "🎉 <span class='text-emerald-400'>Année Validée par compensation ! Félicitations !</span>";
-            } else {
-                objText.innerHTML = `⚠️ Il manque <strong class='text-red-400'>${globalDeficit.toFixed(2)} points de pondération</strong>.`;
-            }
+            let renderedS1Separator = false;
+            let renderedS2Separator = false;
 
             state.units.forEach((unit, uIdx) => {
                 const uStats = unitStatsList[uIdx];
-                const isUnitAcquired = uStats.isAcquired || isYearAcquired;
+                const isSemesterAcquiredInit = (unit.semester === 1 && isS1AcquiredInitial) || (unit.semester === 2 && isS2AcquiredInitial);
+                
+                // L'unité est verrouillée si: Année acquise (initial) OU Semestre Acquis (initial) OU UE Acquise (initial)
+                const isUnitLocked = isYearAcquiredInitial || isSemesterAcquiredInit || uStats.initialAvg >= 10.0;
 
-                let unitHtml = `
-                    <div class="glass-panel p-4 md:p-6 pb-6">
-                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 md:mb-6 border-b border-zinc-700 pb-3 md:pb-4 gap-3">
-                            <div class="flex items-center gap-2 md:gap-4 w-full md:w-auto justify-between md:justify-start">
-                                <input type="text" value="${unit.name}" class="text-xl md:text-2xl font-black text-zinc-100 bg-transparent outline-none border-b-2 border-transparent focus:border-yellow-400 w-40 md:w-64" onchange="updateUnitName(${uIdx}, this.value)">
-                                <button onclick="deleteUnit(${uIdx})" class="text-zinc-500 hover:text-red-400 font-bold bg-zinc-800/50 px-2 py-1 rounded-md text-xs md:text-sm transition-colors whitespace-nowrap">Supprimer Bloc</button>
+                let separatorHtml = "";
+                if (unit.semester === 1 && !renderedS1Separator) {
+                    separatorHtml = `
+                        <div class="shining-bar-container" style="margin-top: 1rem;">
+                            <div class="shining-line"></div>
+                            <div class="shining-badge">
+                                🎒 Semestre 1 ✨
                             </div>
-                            <div class="flex items-center gap-3 w-full md:w-auto bg-zinc-800/50 p-2 rounded-xl md:bg-transparent md:p-0">
-                                <span class="text-xl md:text-2xl font-black ${uStats.isAcquired ? 'text-emerald-400' : 'text-rose-400'} bg-zinc-900 px-3 md:px-4 py-1 rounded-xl shadow-sm border border-zinc-700">${uStats.avg.toFixed(2)}</span>
-                                ${isUnitAcquired ? '<span class="px-2 md:px-3 py-1 rounded-full badge-acquis text-[10px] md:text-sm font-bold shadow-sm whitespace-nowrap">✓ ACQUIS</span>' : '<span class="px-2 md:px-3 py-1 rounded-full badge-rattrapage text-[10px] md:text-sm font-bold shadow-sm whitespace-nowrap">⚠ À COMPENSER</span>'}
+                        </div>
+                    `;
+                    renderedS1Separator = true;
+                } else if (unit.semester === 2 && !renderedS2Separator) {
+                    separatorHtml = `
+                        <div class="shining-bar-container">
+                            <div class="shining-line"></div>
+                            <div class="shining-badge">
+                                🌻 Semestre 2 ✨
+                            </div>
+                        </div>
+                    `;
+                    renderedS2Separator = true;
+                }
+
+                let unitHtml = separatorHtml + `
+                    <div class="glass-panel p-4 md:p-6 pb-6">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 border-b dark:border-zinc-700 border-gray-200 pb-3 gap-3">
+                            <div class="flex items-center gap-2 md:gap-4 w-full md:w-auto justify-between md:justify-start">
+                                <input type="text" value="${unit.name}" class="text-xl md:text-2xl font-black dark:text-zinc-100 text-gray-900 bg-transparent outline-none border-b-2 border-transparent focus:border-blue-500 w-48 md:w-64" onchange="updateUnitField(${uIdx}, 'name', this.value)">
+                                <button onclick="deleteUnit(${uIdx})" class="text-gray-500 hover:text-red-500 font-bold dark:bg-zinc-800/50 bg-gray-100 px-2 py-1 rounded-md text-xs transition-colors">Supprimer UE</button>
+                            </div>
+                            <div class="flex items-center gap-3 w-full md:w-auto dark:bg-zinc-800/50 bg-gray-100 p-2 rounded-xl md:bg-transparent md:p-0">
+                                <span class="text-xl md:text-2xl font-black ${uStats.isAcquired ? 'text-emerald-500' : 'text-red-500'} dark:bg-zinc-900 bg-white px-3 py-1 rounded-xl shadow-sm border dark:border-zinc-700 border-gray-200">${uStats.avg.toFixed(2)}</span>
+                                <span class="px-2 py-1 rounded-full text-xs font-bold shadow-sm ${uStats.isAcquired ? 'dark:bg-emerald-900/30 bg-emerald-100 text-emerald-500 border border-emerald-500/50' : 'dark:bg-red-900/30 bg-red-100 text-red-500 border border-red-500/50'}">
+                                    Crédits: ${uStats.credits}/${unit.creditsTarget}
+                                </span>
                             </div>
                         </div>
 
                         <div class="overflow-x-auto pb-2 w-full">
-                            <table class="w-full text-left border-collapse min-w-full md:min-w-[700px]">
+                            <table class="w-full text-left border-collapse min-w-[750px]">
                                 <thead>
-                                    <tr class="text-zinc-400 text-[9px] md:text-sm border-b border-zinc-700 bg-zinc-800/30">
-                                        <th class="p-1 md:p-3 rounded-tl-xl">Mod.</th>
-                                        <th class="p-1 md:p-3 text-center w-8 md:w-16">Coef</th>
-                                        <th class="p-1 md:p-3 text-center w-10 md:w-20">CC</th>
-                                        <th class="p-1 md:p-3 text-center w-10 md:w-20">Exam</th>
-                                        <th class="p-1 md:p-3 text-center w-14 md:w-36 text-yellow-400 bg-yellow-900/10 leading-tight">Rattrap.🎯</th>
-                                        <th class="p-1 md:p-3 text-center w-10 md:w-20">Moy.</th>
-                                        <th class="p-1 md:p-3 text-center w-20 md:w-24 rounded-tr-xl hidden md:table-cell">Statut</th>
+                                    <tr class="dark:text-zinc-400 text-gray-500 text-[10px] md:text-sm border-b dark:border-zinc-700 border-gray-200 dark:bg-zinc-800/30 bg-gray-50">
+                                        <th class="p-2 rounded-tl-xl">Mod.</th>
+                                        <th class="p-2 text-center w-12">Coef</th>
+                                        <th class="p-2 text-center w-12">Cred</th>
+                                        <th class="p-2 text-center w-16">CC</th>
+                                        <th class="p-2 text-center w-16">Exam</th>
+                                        <th class="p-2 text-center w-32 text-blue-500 dark:bg-blue-900/10 bg-blue-50 leading-tight">Rattrapage🎯</th>
+                                        <th class="p-2 text-center w-16">Moy.</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                 `;
 
                 unit.modules.forEach((mod, mIdx) => {
-                    const modAvg = getModAvg(mod);
-                    const isModAcquired = modAvg >= 10.0;
+                    const avgs = getModAvg(mod);
+                    const isModAcquiredInitial = avgs.isInitialAcquired;
+                    const isModAcquiredFinal = avgs.final >= 10.0;
                     
-                    // The core requirement: NEVER block the rattrapage input.
-                    let rattrapageHtml = `<input type="number" min="0" max="20" step="0.25" value="${mod.rattrapage !== null ? mod.rattrapage : ''}" placeholder="?" class="cute-input grade-input mx-auto border-zinc-600 focus:border-yellow-400 w-12 md:w-20 text-[16px] md:text-sm p-1 md:p-2" onchange="updateGrade(${uIdx}, ${mIdx}, 'rattrapage', this)">`;
+                    // Un module est bloqué si : L'UE est bloquée OU le module a déjà >= 10 initialement
+                    const isFieldLocked = isUnitLocked || isModAcquiredInitial;
+
+                    let rattrapageHtml = "";
                     let estimationHtml = "";
-                    
-                    let statusHtml = "";
-                    if (isYearAcquired || uStats.isAcquired || isModAcquired) {
-                        statusHtml = `<span class="text-emerald-400 font-bold text-xs md:text-sm">✓ Validé</span>`;
+
+                    if (isYearAcquiredInitial) {
+                        rattrapageHtml = `<span class="text-xs text-emerald-500 font-bold bg-emerald-500/10 px-2 py-1 rounded-md border border-emerald-500/30">Année 🔒</span>`;
+                    } else if (isSemesterAcquiredInit) {
+                        rattrapageHtml = `<span class="text-xs text-emerald-500 font-bold bg-emerald-500/10 px-2 py-1 rounded-md border border-emerald-500/30">Semestre 🔒</span>`;
+                    } else if (uStats.initialAvg >= 10.0) {
+                        rattrapageHtml = `<span class="text-xs text-emerald-500 font-bold bg-emerald-500/10 px-2 py-1 rounded-md border border-emerald-500/30">UE 🔒</span>`;
+                    } else if (isModAcquiredInitial) {
+                        rattrapageHtml = `<span class="text-xs text-emerald-500 font-bold bg-emerald-500/10 px-2 py-1 rounded-md border border-emerald-500/30">Acquis 🔒</span>`;
                     } else {
-                        statusHtml = `<span class="text-rose-400 font-bold text-xs md:text-sm">À repasser</span>`;
-                    }
-
-                    // Calculate Estimation only if needed
-                    if (globalDeficit > 0 && parseFloat(mod.coef) > 0 && !isModAcquired) {
-                        const avgIncreaseNeeded = globalDeficit / parseFloat(mod.coef);
-                        const targetModAvg = modAvg + avgIncreaseNeeded; 
+                        // Libre de repasser
+                        rattrapageHtml = `<input type="number" min="0" max="20" step="0.25" value="${mod.rattrapage !== null ? mod.rattrapage : ''}" placeholder="?" class="cute-input grade-input mx-auto border-blue-400 focus:border-blue-600 w-16 text-xs p-1" onchange="updateGrade(${uIdx}, ${mIdx}, 'rattrapage', this)">`;
                         
-                        let targetExam = 0;
-                        if (mod.cc !== null && mod.cc !== "") {
-                            targetExam = (targetModAvg * 2) - parseFloat(mod.cc);
-                        } else {
-                            targetExam = targetModAvg;
-                        }
+                        // ROI & Estimation pour valider l'année
+                        if (globalDeficit > 0 && parseFloat(mod.coef) > 0) {
+                            const avgIncreaseNeeded = globalDeficit / parseFloat(mod.coef);
+                            const targetModAvg = avgs.final + avgIncreaseNeeded; 
+                            
+                            let targetExam = 0;
+                            if (mod.cc !== null && mod.cc !== "") { targetExam = (targetModAvg * 2) - parseFloat(mod.cc); } 
+                            else { targetExam = targetModAvg; }
 
-                        if (targetExam <= 20) {
-                            estimationHtml = `<div class="text-[8px] md:text-[10px] text-yellow-300 font-bold mt-1 md:mt-2 text-center bg-yellow-900/40 rounded-md p-0.5 md:p-1.5 border border-yellow-700/50 shadow-sm leading-tight" title="Obtiens cette note pour valider TOUTE l'année !">🌟 Vise <br class="md:hidden"><strong>${targetExam.toFixed(2)}</strong></div>`;
-                        } else {
-                            estimationHtml = `<div class="text-[8px] md:text-[10px] text-rose-400 font-bold mt-1 md:mt-2 text-center bg-rose-900/20 rounded-md p-0.5 md:p-1.5 border border-rose-800/50 opacity-80 leading-tight">Impos. <br class="md:hidden">(>20)</div>`;
+                            if (targetExam <= 20) {
+                                // High ROI Fire
+                                estimationHtml = `<div class="text-[9px] text-orange-500 font-bold mt-1 text-center bg-orange-500/10 rounded-md p-1 border border-orange-500/30">🔥 Vise <strong>${targetExam.toFixed(2)}</strong></div>`;
+                            } else {
+                                // Low ROI Purple
+                                estimationHtml = `<div class="text-[9px] text-purple-500 font-bold mt-1 text-center bg-purple-500/10 rounded-md p-1 border border-purple-500/30">🟣 Impos. (>20)</div>`;
+                            }
                         }
                     }
 
                     unitHtml += `
-                        <tr class="border-b border-zinc-800/50 hover:bg-zinc-800/80 transition-colors">
-                            <td class="p-0.5 md:p-2">
-                                <div class="flex items-center gap-0.5 md:gap-2">
-                                    <button onclick="deleteModule(${uIdx}, ${mIdx})" class="text-zinc-600 hover:text-red-400 text-xs md:text-lg p-1.5 md:p-1" title="Supprimer module">✖</button>
-                                    <input type="text" value="${mod.name}" class="font-bold text-zinc-100 bg-transparent outline-none w-full min-w-[70px] border-b border-transparent focus:border-yellow-400 text-[10px] md:text-base leading-tight" onchange="updateModField(${uIdx}, ${mIdx}, 'name', this.value)">
+                        <tr class="border-b dark:border-zinc-800/50 border-gray-100 hover:bg-gray-50 dark:hover:bg-zinc-800/80 transition-colors">
+                            <td class="p-2">
+                                <div class="flex items-center gap-2">
+                                    <button onclick="deleteModule(${uIdx}, ${mIdx})" class="text-gray-400 hover:text-red-500 text-sm p-1">✖</button>
+                                    <input type="text" value="${mod.name}" class="font-bold dark:text-zinc-100 text-gray-900 bg-transparent outline-none w-full border-b border-transparent focus:border-blue-500 text-xs md:text-sm" onchange="updateModField(${uIdx}, ${mIdx}, 'name', this.value)">
                                 </div>
                             </td>
-                            <td class="p-0.5 md:p-2 text-center"><input type="number" min="1" value="${mod.coef}" class="cute-input grade-input mx-auto text-[16px] md:text-sm p-0.5 md:p-1.5 w-8 md:w-14" onchange="updateModField(${uIdx}, ${mIdx}, 'coef', this.value)"></td>
-                            <td class="p-0.5 md:p-2 text-center"><input type="number" min="0" max="20" step="0.25" value="${mod.cc !== null ? mod.cc : ''}" placeholder="-" class="cute-input grade-input mx-auto text-[16px] md:text-sm p-0.5 md:p-1.5 w-10 md:w-16" onchange="updateModField(${uIdx}, ${mIdx}, 'cc', this.value)"></td>
-                            <td class="p-0.5 md:p-2 text-center"><input type="number" min="0" max="20" step="0.25" value="${mod.exam !== null ? mod.exam : ''}" placeholder="-" class="cute-input grade-input mx-auto text-[16px] md:text-sm p-0.5 md:p-1.5 w-10 md:w-16 ${mod.rattrapage !== null && mod.rattrapage !== '' ? 'opacity-40 line-through' : ''}" onchange="updateModField(${uIdx}, ${mIdx}, 'exam', this.value)"></td>
-                            <td class="p-0.5 md:p-2 text-center align-top bg-yellow-900/10">
-                                <div class="flex flex-col justify-center h-full">
+                            <td class="p-2 text-center"><input type="number" min="1" value="${mod.coef}" class="cute-input grade-input mx-auto text-xs p-1 w-12" onchange="updateModField(${uIdx}, ${mIdx}, 'coef', this.value)"></td>
+                            <td class="p-2 text-center"><input type="number" min="0" value="${mod.cred}" class="cute-input grade-input mx-auto text-xs p-1 w-12" onchange="updateModField(${uIdx}, ${mIdx}, 'cred', this.value)"></td>
+                            <td class="p-2 text-center"><input type="number" min="0" max="20" step="0.25" value="${mod.cc !== null ? mod.cc : ''}" placeholder="-" class="cute-input grade-input mx-auto text-xs p-1 w-14" onchange="updateModField(${uIdx}, ${mIdx}, 'cc', this.value)"></td>
+                            <td class="p-2 text-center"><input type="number" min="0" max="20" step="0.25" value="${mod.exam !== null ? mod.exam : ''}" placeholder="-" class="cute-input grade-input mx-auto text-xs p-1 w-14 ${mod.rattrapage !== null && mod.rattrapage !== '' ? 'opacity-40 line-through' : ''}" onchange="updateModField(${uIdx}, ${mIdx}, 'exam', this.value)"></td>
+                            <td class="p-2 text-center align-middle dark:bg-blue-900/10 bg-blue-50">
+                                <div class="flex flex-col justify-center items-center h-full">
                                     ${rattrapageHtml}
                                     ${estimationHtml}
                                 </div>
                             </td>
-                            <td class="p-0.5 md:p-2 text-center font-black text-[11px] md:text-lg ${isModAcquired ? 'text-emerald-400' : 'text-yellow-500'}">${modAvg.toFixed(2)}</td>
-                            <td class="p-1 md:p-2 text-center hidden md:table-cell">${statusHtml}</td>
+                            <td class="p-2 text-center font-black text-sm md:text-base ${isModAcquiredFinal ? 'text-emerald-500' : 'text-blue-500'}">${avgs.final.toFixed(2)}</td>
                         </tr>
                     `;
                 });
@@ -512,12 +739,11 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div class="mt-3 md:mt-4 flex justify-end">
-                            <button onclick="addModule(${uIdx})" class="text-xs md:text-sm font-bold text-yellow-500 hover:text-zinc-900 hover:bg-yellow-400 bg-yellow-400/10 px-3 md:px-4 py-1.5 md:py-2 rounded-xl border border-yellow-400/30 transition-colors">+ Ajouter un module ici</button>
+                        <div class="mt-3 flex justify-end">
+                            <button onclick="addModule(${uIdx})" class="text-xs font-bold text-blue-500 hover:text-white hover:bg-blue-500 dark:bg-blue-500/10 bg-blue-100 px-3 py-1.5 rounded-xl transition-colors">+ Ajouter Module</button>
                         </div>
                     </div>
                 `;
-                
                 container.innerHTML += unitHtml;
             });
         };
@@ -525,46 +751,41 @@
         window.updateGrade = (uIdx, mIdx, field, inputEl) => {
             let val = inputEl.value;
             let numVal = val === "" ? null : parseFloat(val);
-            
             let oldVal = state.units[uIdx].modules[mIdx][field];
             state.units[uIdx].modules[mIdx][field] = numVal;
 
             if (numVal !== null && (oldVal === null || numVal > oldVal)) {
                 spawnReaction(inputEl);
             }
-
             renderUnits();
         }
 
         window.updateModField = (uIdx, mIdx, field, val) => {
-            let parsedVal = val === "" ? null : (field === 'coef' ? parseFloat(val) || 1 : (field === 'name' ? val : parseFloat(val)));
+            let parsedVal = val === "" ? null : (['coef', 'cred'].includes(field) ? parseFloat(val) || 0 : (field === 'name' ? val : parseFloat(val)));
             state.units[uIdx].modules[mIdx][field] = parsedVal;
             renderUnits();
         }
 
-        window.updateUnitName = (uIdx, val) => {
-            state.units[uIdx].name = val;
+        window.updateUnitField = (uIdx, field, val) => {
+            state.units[uIdx][field] = val;
             renderUnits();
         }
 
         window.addUnit = () => {
             state.units.push({
-                id: "u" + Date.now(), name: "Nouveau Semestre",
-                modules: [{ id: "m" + Date.now(), name: "Nouveau Module", coef: 1, cc: null, exam: null, rattrapage: null }]
+                id: "u" + Date.now(), name: "🎒 Nouvelle UE", type: "UE", creditsTarget: 5, semester: 1,
+                modules: [{ id: "m" + Date.now(), name: "Nouveau Module", coef: 1, cred: 5, cc: null, exam: null, rattrapage: null }]
             });
             renderUnits();
         }
 
         window.addModule = (uIdx) => {
-            state.units[uIdx].modules.push({ id: "m" + Date.now(), name: "Module", coef: 1, cc: null, exam: null, rattrapage: null });
+            state.units[uIdx].modules.push({ id: "m" + Date.now(), name: "Module", coef: 1, cred: 2, cc: null, exam: null, rattrapage: null });
             renderUnits();
         }
 
         window.deleteUnit = (uIdx) => {
-            showConfirm("Supprimer tout ce semestre ?", () => {
-                state.units.splice(uIdx, 1);
-                renderUnits();
-            });
+            showConfirm("Supprimer toute cette UE ?", () => { state.units.splice(uIdx, 1); renderUnits(); });
         }
 
         window.deleteModule = (uIdx, mIdx) => {
@@ -575,37 +796,46 @@
             });
         }
 
-        const emojis = ['🍌', '✨', '💛', '🌙', '⚡'];
+        const emojis = ['🎓', '✨', '💙', '🚀', '🌟'];
         function spawnReaction(element) {
             const rect = element.getBoundingClientRect();
             for(let i=0; i<4; i++) {
                 const particle = document.createElement('div');
-                particle.className = 'particle';
+                particle.className = 'pop-reaction';
                 particle.innerText = emojis[Math.floor(Math.random() * emojis.length)];
                 particle.style.left = (rect.left + (Math.random() * rect.width) - 10) + 'px';
                 particle.style.top = (rect.top - 20) + 'px';
-                particle.style.animationDuration = (Math.random() * 0.8 + 1) + 's';
                 document.body.appendChild(particle);
-                setTimeout(() => particle.remove(), 2000);
+                setTimeout(() => particle.remove(), 1000);
             }
         }
 
+        function triggerGraduation() {
+            for(let i=0; i<30; i++) {
+                const conf = document.createElement('div');
+                conf.className = 'falling-confetti';
+                conf.innerText = ['🎓', '🎉', '✨', '📜'][Math.floor(Math.random() * 4)];
+                conf.style.left = Math.random() * 100 + 'vw';
+                conf.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                conf.style.animationDelay = (Math.random() * 1) + 's';
+                document.body.appendChild(conf);
+                setTimeout(() => conf.remove(), 4000);
+            }
+        }
+
+        // Duaas rotation
         const arabicDuaas = [
-            "اللهم لا سهل إلا ما جعلته سهلاً، وأنت تجعل الحزن إذا شئت سهلاً 🤲",
-            "رب اشرح لي صدري ويسر لي أمري 🍌",
-            "اللهم افتح عليّ فتوح العارفين بحكمتك ✨",
-            "ربي يسر ولا تعسر، ربي أتمم بالخير 💛",
-            "اللهم إني أستودعك ما قرأت وما حفظت فرده عند حاجتي إليه 📚",
-            "اللهم ارزقني قوة الحفظ وسرعة الفهم وصفاء الذهن 🌟",
-            "توكلت على الله ولا حول ولا قوة إلا بالله 🤍"
+            "اللهم لا سهل إلا ما جعلته سهلاً 🤲",
+            "رب اشرح لي صدري ويسر لي أمري ✨",
+            "اللهم افتح عليّ فتوح العارفين 🎓",
+            "ربي يسر ولا تعسر 💙",
+            "اللهم ارزقني قوة الحفظ وسرعة الفهم 🌟"
         ];
 
         function rotateDuaa() {
             const duaaEl = document.getElementById('arabic-duaa-container');
             if(!duaaEl) return;
-            
             duaaEl.style.opacity = '0';
-            
             setTimeout(() => {
                 duaaEl.innerText = arabicDuaas[Math.floor(Math.random() * arabicDuaas.length)];
                 duaaEl.style.opacity = '1';
@@ -618,7 +848,6 @@
             document.getElementById('onboarding').classList.remove('hidden');
             rotateDuaa();
         };
-
     </script>
 </body>
 </html>
